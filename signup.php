@@ -164,7 +164,6 @@ if(isset($_POST['register'])){
                     </li>
                     <li>New account / Sign in</li>
                 </ul>
-
             </div>
 
             <div class="col-md-6">
