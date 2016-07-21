@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 
+<!-- SEARCH FUNCTIONALITY -->
+
 <head>
 
     <meta charset="utf-8">
@@ -54,7 +56,7 @@
                             echo "<li><a href='#' data-toggle='modal' data-target='#login-modal'>Login</a></li>";
                         }
                         else{
-                            echo "<li><a href='#'>Logout</a></li>";
+                            echo "<li><a href='logout.php'>Logout</a></li>";
                             echo "<li><a href='orderstatus.php'>Check Order</a></li>";
                         }
                     }
@@ -108,7 +110,7 @@
                         if($un && $pw){
                             $salt=sha1(md5($pw));
                             $pwchk=md5($pw).$salt;
-                            $query="select username, type from accounts where username='$un' and password='$pwchk'";
+                            $query="select account_id, username, type from accounts where username='$un' and password='$pwchk'";
                             $result=@mysqli_query($dbc, $query);
                             $row=mysqli_fetch_array($result, MYSQLI_ASSOC);
 
@@ -117,6 +119,7 @@
                                 $_SESSION['type']=$row['type'];
 
                                 $_SESSION['is_loggedin']=1;
+                                $_SESSION['acc_id']=$row['account_id'];
 
                                 if($row['type']=='uac'){
                                     header("Location: http://".$_SERVER['HTTP_HOST'].  dirname($_SERVER['PHP_SELF'])."/index.php");
@@ -164,9 +167,26 @@
         </div>
     </div>
 
+    <?php
+
+        if(isset($_POST['search'])){
+
+            //makes sure search has value
+            if(isset($_POST['search-input'])){
+                $_SESSION['searchstring']=$_POST['search-input'];
+            }
+
+            //double checks search has value
+            if($_SESSION['searchstring']){
+                header("Location: searchresults.php");
+            }
+        }
+    ?>
+
     <!-- *** TOP BAR END *** -->
 
     <!-- *** NAVBAR ***
+
     _________________________________________________________ -->
 
     <div class="navbar navbar-default yamm" role="navigation" id="navbar">
@@ -220,8 +240,6 @@
                                         </div>
                                         <div class="col-lg-2">
                                             <h5><a href="footwear.php">Footwear</a></h5>
-
-                                            
                                         </div>
                                     </div>
                                 </div>
@@ -308,7 +326,6 @@
                             <!--/.nav-collapse -->
 
                             <div class="navbar-buttons">
-
                                 <div class="navbar-collapse collapse right" id="basket-overview">
                                     <a href="basket.html" class="btn btn-primary navbar-btn"><i class="fa fa-shopping-cart"></i><span class="hidden-sm">3 items in cart</span></a>
                                 </div>
@@ -320,51 +337,17 @@
                                         <i class="fa fa-search"></i>
                                     </button>
                                 </div>
-
                             </div>
 
-                            <!-- SEARCH FUNCTIONALITY -->
-                            <?php
-
-                            if(isset($_POST['search'])){
-
-                                    //makes sure search has value
-                                if(isset($_POST['search-input'])){
-                                    $searchstring=$_POST['search-input'];
-                                }
-
-                                    //double checks search has value
-                                if($searchstring){
-
-                                    $search_query="select prod_name, prod_desc, prod_price, image from products
-                                    where prod_name like '%{$searchstring}%'
-                                    order by 'category' AND 'prod_name'";
-                                    $result=@mysqli_query($dbc, $search_query);
-                                    $row=mysqli_fetch_array($result, MYSQLI_ASSOC);
-
-                                    if($row){
-
-                                        //idk this part
-                                    }
-                                }
-                            }
-
-
-                            ?>
-
                             <div class="collapse clearfix" id="search">
-
-                                <form class="navbar-form" role="search">
+                                <form class="navbar-form" action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
                                     <div class="input-group">
                                         <input type="text" class="form-control" name="search-input" placeholder="Search">
                                         <span class="input-group-btn">
-
                                             <button type="submit" class="btn btn-primary" name="search"><i class="fa fa-search"></i></button>
-
                                         </span>
                                     </div>
                                 </form>
-
                             </div>
                             <!--/.nav-collapse -->
                         </div>
