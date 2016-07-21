@@ -105,7 +105,7 @@
                         else{
                             $pw=$_POST['pw-modal'];
                         }
-
+                        
                             //makes sure username and password have values before error check
                         if($un && $pw){
                             $salt=sha1(md5($pw));
