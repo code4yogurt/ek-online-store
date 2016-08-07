@@ -2,6 +2,11 @@
 session_start();
 require_once('../mysql_connect.php');
 
+$user=$_SESSION['type'];
+if($user!='aac'){
+  header("Location: http://".$_SERVER['HTTP_HOST'].  dirname($_SERVER['PHP_SELF'])."/index.php");
+}
+
 echo $_POST['pending']; 
  
 $id=$_POST['pending']; 

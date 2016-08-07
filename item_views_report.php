@@ -9,84 +9,87 @@ if($user!='aac'){
 }
 
 if(isset($_POST['item'])){
-$item=$_POST['item'];
-$_SESSION['inventory_item_change']=$item;
+$item_code=$_POST['item'];
+$_SESSION['item_viewed']=$item_code;
 }
 else{
-	$item=$_SESSION['inventory_item_change'];
+	$item_code=$_SESSION['item_viewed'];
 }
-$query="SELECT prod_name FROM products where prod_code=$item";
+
+$query="select prod_name from products where prod_code=$item_code";
 $result=mysqli_query($dbc,$query);
 $row=mysqli_fetch_array($result, MYSQLI_ASSOC);
 $name=$row['prod_name'];
 
-$user=$_SESSION['type'];
-if($user!='aac'){
-  header("Location: http://".$_SERVER['HTTP_HOST'].  dirname($_SERVER['PHP_SELF'])."/index.php");
-}
-$datetime= date("Y-m-d H:i:s");
-
-$query="SELECT count(event_date) as event_count FROM inventory where prod_code=$item";
+$query="select count(view_id) as view_count FROM product_view where prod_code=$item_code";
 $result=mysqli_query($dbc,$query);
 $row=mysqli_fetch_array($result, MYSQLI_ASSOC);
-$pages=$row['event_count'] / 10;
+$pages=$row['view_count'] / 10;
 $page_no=ceil($pages);
 
 $start=0;
-if(isset($_GET['go'])){
-	$pn=$_GET['dropdown'];
+if(isset($_POST['go'])){
+	$pn=$_POST['dropdown'];
 
-$start=($_GET['dropdown']-1)*10;
+$start=($_POST['dropdown']-1)*10;
 }
 else{
 $pn=1;
 }
 
+$datetime= date("Y-m-d H:i:s");
+
 echo"
-<p align='center'><b>'{$name}' INVENTORY CHANGE HISTORY REPORT</p></b>
+<p align='center'><b>'{$name}' VIEWS REPORT</p></b>
 <p align='left'>$datetime</p>
 <table width='75%' border='1' align='center' cellpadding='0' cellspacing='0' bordercolor='#000000'>
 <tr>
 <td>
-DATE
+DATE VIEWED
 </td>
 <td>
-CHANGED BY
-</td>
-
-<td>
-CHANGE TYPE
+USER IP ADDRESS
 </td>
 <td>
-QUANTITY
+USER
 </td>
 </tr>
 ";
 
-$query="SELECT event_date, a.username, p.prod_name, change_type, quantity FROM accounts a join inventory i on a.account_id=i.account_id join products p on i.prod_code=p.prod_code where i.prod_code=$item order by event_date desc LIMIT $start,10";
+$query="SELECT view_date,ip_address,account_id FROM product_view where prod_code=$item_code order by view_date desc LIMIT $start,10";
 $result=mysqli_query($dbc,$query);
 while($row=mysqli_fetch_array($result,MYSQLI_ASSOC)){
 echo"
 <tr>
 <td>
-{$row['event_date']}
+{$row['view_date']}
 </td>
 <td>
-{$row['username']}
+{$row['ip_address']}
 </td>
 <td>
-{$row['change_type']}
+";
+if($row['account_id']==0){
+	echo "GUEST";
+}
+else{
+$query2="SELECT username from accounts where account_id={$row['account_id']}";
+$result2=mysqli_query($dbc,$query2);
+while($row2=mysqli_fetch_array($result2,MYSQLI_ASSOC)){
+echo"
+{$row2['username']}
+";
+}
+}
+echo"
 </td>
-<td>
-<p align='right'>{$row['quantity']}</p>
-</td>
-
 </tr>
 ";
 }
+
 echo"</table>";
-if(isset($_GET['dropdown'])){
-if($_GET['dropdown']==$page_no){
+if(isset($_POST['dropdown'])){
+if($_POST['dropdown']==$page_no){
 echo "<p align='center'><b>----END OF REPORT----</p></b>";
 }
 }
@@ -99,7 +102,7 @@ else{
 
 echo "<p align='right'>Page: {$pn}	</p>";
 echo"
-<form action='{$_SERVER['PHP_SELF']}' method='GET'>
+<form action='{$_SERVER['PHP_SELF']}' method='POST'>
 <p align='right'>Page: <select name='dropdown'></p>
 ";
 for($i=$page_no;$i>0;$i--){
@@ -112,4 +115,9 @@ echo"
 <input type='submit' name='go' value='Go' />
 </form>
 ";
+
+
+
+
+
 ?>

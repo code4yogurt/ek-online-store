@@ -1,6 +1,11 @@
 <?php
 session_start();
 require_once('../mysql_connect.php');
+
+$user=$_SESSION['type'];
+if($user!='aac'){
+  header("Location: http://".$_SERVER['HTTP_HOST'].  dirname($_SERVER['PHP_SELF'])."/index.php");
+}
 ?>
 <b>LIST OF ACTIVE PRODUCTS:</b><br><br>
 <!-- ERROR HANDLING-->
@@ -36,7 +41,7 @@ $start=($_GET['dropdown']-1)*10;
 else{
 $pn=1;
 }
-echo "<br>Page: {$pn}	";
+
 
 
 echo"
@@ -86,13 +91,14 @@ echo"
 }
 echo"
 </table>
-<input type='submit' name='product_change' value='Proceed' />
+<p align='center'><input type='submit' name='product_change' value='Proceed' /></p>
 </form>
 ";
 
+echo "<p align='right'>Page: {$pn}	</p>";
 echo"
 <form action='{$_SERVER['PHP_SELF']}' method='GET'>
-Page: <select name='dropdown'>
+<p align='right'>Page: <select name='dropdown'></p>
 ";
 for($i=$page_no;$i>0;$i--){
 	echo"

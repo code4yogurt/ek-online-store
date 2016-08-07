@@ -1,7 +1,9 @@
 <?php
 session_start();
 require_once('../mysql_connect.php');
-
+?>
+<a href="featured_items.php">Back</a>
+<?php
   $query="select count(prod_code) as prod_count from products where prod_code not in(select prod_id from featured_items where date_end is null)";
 	$result=mysqli_query($dbc,$query);
 	$row=mysqli_fetch_array($result, MYSQLI_ASSOC);
@@ -17,7 +19,7 @@ require_once('../mysql_connect.php');
 	else{
 	$pn=1;
 	}
-	echo "<br>Page: {$pn}	<br><br>";
+	
 
 
 
@@ -28,6 +30,7 @@ require_once('../mysql_connect.php');
 
 
    echo"
+   <p align='center'><b>LIST OF PRODUCTS</p></b>
    <table width='75%' border='1' align='center' cellpadding='0' cellspacing='0' bordercolor='#000000'>
    <tr>
    	<td>
@@ -57,7 +60,7 @@ require_once('../mysql_connect.php');
 	echo"
 	</table>
 	";
-
+	echo "Page: {$pn}	";
 echo"
 	<form action='{$_SERVER['PHP_SELF']}' method='GET'>
 	Page: <select name='dropdown'>

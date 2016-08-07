@@ -3,6 +3,11 @@
 session_start();
 require_once('../mysql_connect.php');
 
+$user=$_SESSION['type'];
+if($user!='aac'){
+  header("Location: http://".$_SERVER['HTTP_HOST'].  dirname($_SERVER['PHP_SELF'])."/index.php");
+}
+
 echo"
 <form action='{$_SERVER['PHP_SELF']}' method='POST'>View by: 
 <select name='dropdown'>
@@ -13,18 +18,23 @@ echo"
 </form>
 ";
 
-$user=$_SESSION['type'];
-if($user!='aac'){
-  header("Location: http://".$_SERVER['HTTP_HOST'].  dirname($_SERVER['PHP_SELF'])."/index.php");
-}
+
 $datetime= date("Y-m-d H:i:s");
 
 
-$view='product';
+
+
 if(isset($_POST['dropdown'])){
-	$view=$_POST['dropdown'];
+	$_SESSION['sales_view']=$_POST['dropdown'];
 	}
-if($view=='product'){
+else if(isset($_SESSION['sales_view'])){
+
+}
+else{
+$_SESSION['sales_view']='product';	
+}
+
+if($_SESSION['sales_view']=='product'){
 
 $query="SELECT count(distinct(p.prod_name)) AS prod_count FROM cart c join inventory i on c.event_id=i.event_id join products p on i.prod_code=p.prod_code WHERE c.cart_status=0";
 $result=mysqli_query($dbc,$query);

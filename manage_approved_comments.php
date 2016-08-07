@@ -1,6 +1,12 @@
 <?php
 session_start();
 require_once('../mysql_connect.php');
+
+$user=$_SESSION['type'];
+if($user!='aac'){
+  header("Location: http://".$_SERVER['HTTP_HOST'].  dirname($_SERVER['PHP_SELF'])."/index.php");
+}
+
 ?>
 <a href='manage_comments.php'>Pending Comments</a> | 
 <a href='manage_approved_comments.php'>Approved Comments</a> | 
@@ -27,7 +33,7 @@ $start=($_GET['dropdown']-1)*10;
 else{
 $pn=1;
 }
-echo "<br>Page: {$pn}	";
+
 
 
 echo"
@@ -83,6 +89,7 @@ while($row=mysqli_fetch_array($result,MYSQLI_ASSOC)){
 
 echo"
 </table>
+<br>Page: {$pn}
 <form action='{$_SERVER['PHP_SELF']}' method='GET'>
 Page: <select name='dropdown'>
 ";
