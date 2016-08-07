@@ -2,12 +2,21 @@
 session_start();
 require_once('../mysql_connect.php');
 
+$user=$_SESSION['type'];
+if($user!='aac'){
+  header("Location: http://".$_SERVER['HTTP_HOST'].  dirname($_SERVER['PHP_SELF'])."/index.php");
+}
+
+
 echo "Welcome Admin: ";
 echo $_SESSION['username'];
 echo "<br><br>";
 echo "<a href='change_stock.php'>Add/Deduct Stock</a><br>";
 echo "<a href='inventory_change.php'>Inventory Change</a><br>";
 echo "<a href='inventory_report.php'>Current Inventory</a><br>";
+echo "<a href='views_report.php'>Item Views Report</a><br>";
+echo "<a href='total_sales_report.php'>Total Sales Report</a><br>";
+echo "<a href='sales_report.php'>Sales Report</a><br>";
 echo "<a href='manage_comments.php'>Manage Product Reviews/Comments</a><br>";
 echo "<a href='view_comments.php'>View Comments</a><br>";
 echo"<a href='addproduct.php'>Add New Product</a><br><br>";
