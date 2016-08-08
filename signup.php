@@ -1,174 +1,246 @@
 <?php
+
 session_start();
-if(isset($_POST['submit'])){
-	require_once('../db_connect.php');
-	$message=NULL;
-	//CHECKS IF USER ID WAS INPUTTED
-	if(empty($_POST['userid'])){
-		$uid=FALSE;
-		$message='User ID is required.';
-	}
-	else{
-		$logincheck="select username from accounts where username='{$_POST['userid']}'";
-		$checkresult=@mysqli_query($dbc, $logincheck);
-		$row=mysqli_fetch_array($checkresult, MYSQLI_ASSOC);
-		if(empty($row)){
-			$uid=$_POST['userid'];
-		}
-		else{
-			$message='Username already exists!';
-			$uid=FALSE;
-		}
-	}
-	//CHECKS IF PASSWORD WAS INPUTTED
-	if(empty($_POST['password'])){
-		$pw=FALSE;
-		$message='Passowrd is required.';
-	}
-	else{
-		$pw=$_POST['password'];
-	}
-	if(empty($_POST['pwconfirm'])){
-		$cpw=FALSE;
-		$message='Please confirm password';
-	}
-	else{
-		$cpw=$_POST['pwconfirm'];
-	}
-	//CHECKS IF E-MAIL WAS INPUTTED
-	if(empty($_POST['email'])){
-		$em=FALSE;
-		$message='Email is required';
-	}
-	else{
-		$em=$_POST['email'];
-	}
-	//CHECKS IF FIRST NAME WAS INPUTTED
-	if(empty($_POST['fname'])){
-		$fn=FALSE;
-		$message='First name is required.';
-	}
-	else{
-		$fn=$_POST['fname'];
-	}
-	//CHECKS IF LAST NAME WAS INPUTTED
-	if(empty($_POST['lname'])){
-		$ln=FALSE;
-		$message='Last name is required.';
-	}
-	else{
-		$ln=$_POST['lname'];
-	}
-	//CHECKS IF BIRTHDAY WAS INPUTTED
-	if(empty($_POST['bday'])){
-		$bd=FALSE;
-		$message='Birthdate is required.';
-	}
-	else{
-		$bd=$_POST['bday'];
-	}
-	//CHECKS IF CONTACT NUMBER WAS INPUTTED
-	if(empty($_POST['cnumber'])){
-		$cn=FALSE;
-		$message='Contact number is required';
-	}
-	else{
-		$cn=$_POST['cnumber'];
-	}
-	//CHECKS IF ADDRESS WAS INPUTTED
-	if(empty($_POST['address'])){
-		$ad=FALSE;
-		$message='Address is required';
-	}
-	else{
-		$ad=$_POST['address'];
-	}
-	//CHECKS IF GENDER WAS INPUTTED
-	if(empty($_POST['gender'])){
-		$gd=FALSE;
-		$message='Gender is required';
-	}
-	else{
-		$gd=$_POST['gender'];
-	}
-	//VALUES uid:USER_ID ; pw:PASSWORD ; em:EMAIL ; fn:FIRST_NAME ; ln:LAST_NAME ; bd:BIRTHDAY ; cn:CONTACT_NO ; ad:ADDRESS ; gd:GENDER ; ut:USER_TYPE
-	if($pw!=$cpw){
-		$pwerror='Passwords do not match!';
-	}
-	else if($uid && $pw && $em && $fn && $ln && $bd && $cn && $ad && $gd){
-		$salt = sha1(md5($pw));
-		$encpw = md5($pw).$salt;
-		$query="insert into accounts (email, username, password, first_name, last_name, birthdate, contact_number, address, gender, type)
-				values ('{$em}','{$uid}','{$encpw}','{$fn}','{$ln}','{$bd}','{$cn}','{$ad}','{$gd}','uac')";
-		$result=@mysqli_query($dbc,$query); 
-		$_SESSION['signupmsg']='New Account has been added!';
-		$_SESSION['signupflag']=1;
-		header("Location: http://".$_SERVER['HTTP_HOST'].  dirname($_SERVER['PHP_SELF'])."/loginpage.php");
-	}
+require_once('/connect.php');
+
+if(isset($_SESSION['badlogin'])){
+    if($_SESSION['badlogin']>=999){
+        header("Location: http://".$_SERVER['HTTP_HOST'].dirname($_SERVER['PHP_SELF'])."/blocked.php");
+    }
 }
-if(isset($message)){
-	echo '<font color="red">'.$message.'</font><br>';
-	echo '<font color="red">'.$pwerror.'</font>';
+
+    //PHP FORM FOR LOGIN FORM
+
+if(isset($_POST['login'])){ 
+
+        //checks if username field is empty
+    if(empty($_POST['login-username'])){
+        $un=FALSE;
+        $un_msg="You forgot to enter your username!";
+    }
+    else{
+        $un=$_POST['login-username'];
+    }
+        //checks if password field is empty
+    if(empty($_POST['login-password'])){
+        $pw=FALSE;
+        $pw_msg="You forgot to enter your password!";
+    }
+    else{
+        $pw=$_POST['login-password'];
+    }
+
+        //makes sure username and password have values before error check
+    if($un && $pw){
+        $salt=sha1(md5($pw));
+        $pwchk=md5($pw).$salt;
+        $query="select account_id, username, type from accounts where username='$un' and password='$pwchk'";
+        $result=@mysqli_query($dbc, $query);
+        $row=mysqli_fetch_array($result, MYSQLI_ASSOC);
+
+        if($row){
+            $_SESSION['username']=$row['username'];
+            $_SESSION['type']=$row['type'];
+
+            $_SESSION['is_loggedin']=1;
+            $_SESSION['acc_id']=$row['account_id'];
+
+            if($row['type']=='uac'){
+                header("Location: http://".$_SERVER['HTTP_HOST'].  dirname($_SERVER['PHP_SELF'])."/index.php");
+            }
+            else if($row['type']=='aac'){
+                header("Location: http://".$_SERVER['HTTP_HOST'].  dirname($_SERVER['PHP_SELF'])."/admin.php");
+            }
+            else if($row['type']=='sac'){
+                header("Location: http://".$_SERVER['HTTP_HOST'].  dirname($_SERVER['PHP_SELF'])."/shipper.php");
+            }
+            exit();
+        }
+        else{
+            echo "<font color='red'> Username & Password do not match! </font>";
+        }
+    }
+    else{
+        echo "<font color='red'> Please try again! </font>";
+    }
 }
+
+    //PHP CODE FOR REGISTRATION FORM
+
+if(isset($_POST['register'])){
+
+        //checks if email field is empty
+    if(empty($_POST['reg-email'])){
+        $em=FALSE;
+        $em_msg="You forgot to enter your e-mail!";
+    }
+    else{
+        $em=$_POST['reg-email'];
+    }
+
+        //checks if username field is empty
+    if(empty($_POST['reg-username'])){
+        $un=FALSE;
+        $un_msg="You forgot to enter your username!";
+    }
+    else{
+        $un=$_POST['reg-username'];
+    }
+
+        //checks if password field is empty
+    if(empty($_POST['reg-password'])){
+        $pw=FALSE;
+        $pw_msg="You forgot to enter your password!";
+    }
+    else{
+        $pw=$_POST['reg-password'];
+    }
+
+        //checks if password verification field is empty
+    if(empty($_POST['pwverify'])){
+        $pwv=FALSE;
+    }
+    else{
+        $pwv=$_POST['pwverify'];
+    }
+
+        //checks if gender field is empty
+    if(empty($_POST['reg-contactno'])){
+        $cn=FALSE;
+        $message='You forgot to select a gender!';
+    }
+    else{
+        $cn=$_POST['reg-contactno'];
+    }
+
+
+
+        /* VALUES - em:E-MAIL; un:USERNAME; pw:PASSWORD; pwv:PASSWORD VERIFICATION; gd:GENDER;
+        Makes sure all the fields have are not empty */
+        if($em && $un && $pw && $pwv && $cn){
+
+        //checks if password matches the password verification
+            if($pw!=$pwv){
+                $pwerror_msg="Passwords do not match!";
+            }
+            else{
+
+                $salt = sha1(md5($pw));
+                $encpw = md5($pw).$salt;
+
+                $query = "insert into accounts (email, username, password, contact_number, type)
+                values ('{$em}', '{$un}', '{$encpw}', '{$cn}', 'uac')";
+
+                $result=@mysqli_query($dbc,$query);
+
+                $_SESSION['signup-msg']="New account has been added!";
+                $_SESSION['signup-flag']=1;
+                $_SESSION['is_loggedin']=1;
+
+                header("Location: http://".$_SERVER['HTTP_HOST'].  dirname($_SERVER['PHP_SELF'])."/index.php");
+            }
+        }
+        else{
+            echo "<font color=r'red'> Please try again! </font>";
+        }
+    }
+
+    ?>
+
+    <?php
+    require_once('/navbar.php');
+    ?>
+
+   <!-- *** NAVBAR END *** -->
+
+   <div id="all">
+
+    <div id="content">
+        <div class="container">
+
+            <div class="col-md-12">
+
+                <ul class="breadcrumb">
+                    <li><a href="#">Home</a>
+                    </li>
+                    <li>New account / Sign in</li>
+                </ul>
+
+            </div>
+
+            <div class="col-md-6">
+                <div class="box">
+                    <h1>New account</h1>
+
+                    <p class="lead">Not our registered customer yet?</p>
+
+                    <hr>
+
+                    <form action="<?php echo $_SERVER["PHP_SELF"]; ?>" method="post">
+
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="text" class="form-control" name="reg-email">
+                        </div>
+                        <div class="form-group">
+                            <label for="name">Username</label>
+                            <input type="text" class="form-control" name="reg-username">
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" class="form-control" name="reg-password">
+                        </div>
+                        <div class="form-group">
+                            <label for="pwverify">Confirm Password</label>
+                            <input type="password" class="form-control" name="pwverify">
+                        </div>
+                        <div class="form-group">
+                            <label for="contactno">Contact Number</label><br>
+                            <input type="text" class="form-control" name="reg-contactno">
+                        </div> 
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary" name="register"><i class="fa fa-user-md"></i> Register</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="box">
+                    <h1>Login</h1>
+
+                    <p class="lead">Already our customer?</p>
+
+                    <hr>
+
+                    <form action="<?php echo $_SERVER["PHP_SELF"]; ?>" method="post">
+
+                        <div class="form-group">
+                            <label for="username">Username</label>
+                            <input type="text" class="form-control" name="login-username">
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" class="form-control" name="login-password">
+                        </div>
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary" name="login"><i class="fa fa-sign-in"></i> Log in</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+
+        </div>
+        <!-- /.container -->
+    </div>
+    <!-- /#content -->
+
+<?php
+
+require_once('/footer.php');
+
 ?>
+</body>
 
-<style>
-	.form-group{
-		width:20em;
-	}
-</style>
-
-<link rel="stylesheet" href="css/bootstrap.min.css">
-<form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
-<fieldset><legend>ACCOUNT CREATION</legend>
-
-<div class="container-fluid">
-
-<div class="form-group">
-	<label for="userid">Username</label>
-	<input type="text" class="form-control" name="userid" size="20" maxlength="30" value="<?php if(isset($_POST['userid'])) echo $_POST['userid']; ?>"/><br>
-</div>
-<div class="form-group">
-	<label for="password">Password</label>
-	<input type="password" class="form-control" name="password" size="20" maxlength="30" /><br>
-</div>
-<div class="form-group">
-	<label for="pwconfirm">Confirm Password</label>
-	<input type="password" class="form-control" name="pwconfirm" size="20" maxlength="30"/><br>
-</div>
-<div class="form-group">
-	<label for="emailAddress">E-mail Address</label>
-	<input type="text" class="form-control" name="email" size="20" maxlength="30" placeholder="carlos123@yahoo.com" value="<?php if(isset($_POST['email'])) echo $_POST['email']; ?>"/><br>
-</div>
-<div class="form-group">
-	<label for="firstname">First Name</label>
-	<input type="text" name="fname" class="form-control" size="20" maxlength="30" value="<?php if(isset($_POST['fname'])) echo $_POST['fname']; ?>"/><br>
-</div>
-<div class="form-group">
-	<label for="lastname">Last Name</label>
-	<input type="text" name="lname" class="form-control" size="20" maxlength="30" value="<?php if(isset($_POST['lname'])) echo $_POST['lname']; ?>"/><br>
-</div>
-<div class="form-group">
-	<label for="birthdate">Birthdate</label>
-	<input type="date" class="form-control" name="bday" value="<?php if(isset($_POST['bday'])) echo $_POST['bday']; ?>"/><br>
-</div>
-<div class="form-group">
-	<label for="contactnumber">Contact Number</label>
-	<input type="text" class="form-control" name="cnumber" size="20" maxlength="30" value="<?php if(isset($_POST['cnumber'])) echo $_POST['cnumber']; ?>"/><br>
-</div>
-<div class="form-group">
-	<label for="address">Address</label>
-	<br><textarea rows="4" class="form-control" cols="50" name="address" value="<?php if(isset($_POST['address'])) echo $_POST['address']; ?>"> </textarea><br>
-</div>
-<div class="form-group">
-	<label for="Gender">Gender</label>
-	<label class="radio-inline">
- 	<input type="radio" name="gender" id="inlineRadio1" value="M"> M
-	</label>
-	<label class="radio-inline">
-  	<input type="radio" name="gender" id="inlineRadio2" value="F"> F
-	</label>
-</div> <br>
-<input type="submit" class="btn btn-default" name="submit" value="Sign-Up"/>
-</div>
-</form>
+</html>
