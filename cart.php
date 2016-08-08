@@ -47,7 +47,7 @@ echo '<table width="75%" border="1" align="center" cellpadding="0" cellspacing="
 
 </tr>';
 $total=0;
-$query="SELECT p.prod_name,sum(I.quantity),SUM(P.prod_price) FROM inventory I JOIN products P on I.prod_code=P.prod_code WHERE I.event_id in (select event_id from cart where account_id ='{$user_id}') group by I.prod_code,I.quantity";
+$query="SELECT p.prod_name,sum(I.quantity),SUM(P.prod_price) FROM inventory I JOIN products P on I.prod_code=P.prod_code WHERE I.event_id in (select event_id from cart where account_id ='{$user_id}' AND cart_status=1)  group by I.prod_code,I.quantity";
 $result=mysqli_query($dbc,$query);
 while($row=mysqli_fetch_array($result,MYSQLI_ASSOC)){
 echo'<tr>';
