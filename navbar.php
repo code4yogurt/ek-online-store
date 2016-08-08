@@ -105,7 +105,7 @@
                         else{
                             $pw=$_POST['pw-modal'];
                         }
-                        
+
                             //makes sure username and password have values before error check
                         if($un && $pw){
                             $salt=sha1(md5($pw));
@@ -327,7 +327,7 @@
 
                             <div class="navbar-buttons">
                                 <div class="navbar-collapse collapse right" id="basket-overview">
-                                    <a href="basket.html" class="btn btn-primary navbar-btn"><i class="fa fa-shopping-cart"></i><span class="hidden-sm">3 items in cart</span></a>
+                                    <a href="basket.html" class="btn btn-primary navbar-btn"><i class="fa fa-shopping-cart"></i></a>
                                 </div>
                                 <!--/.nav-collapse -->
 

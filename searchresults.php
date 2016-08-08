@@ -30,7 +30,7 @@ if(empty($_SESSION['searchstring'])){
 					<?php
 
 					$search_query="select prod_name, prod_desc, prod_price, image from products 
-					where prod_name like '%{$_SESSION['searchstring']}%' 
+								   where prod_name like '%{$_SESSION['searchstring']}%' 
 					order by 'category' AND 'prod_name'"; 
 					$result=@mysqli_query($dbc, $search_query); 
 					$row=mysqli_fetch_array($result, MYSQLI_ASSOC); 

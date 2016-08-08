@@ -34,46 +34,72 @@ require_once('/navbar.php');
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
-                                        <th>Order</th>
+                                        <th>Order Number</th>
                                         <th>Date</th>
-                                        <th>Total</th>
-                                        <th>Status</th>
+                                        <th>Total Price</th>
+                                        <th>Action</th>
                                     </tr>
                                 </thead>
+
                                 <tbody>
+
                                     <?php
+                                        $orderstatus_query="select O.receipt_id, O.transaction_date, SUM(P.prod_price) as total_price 
+                                                            from inventory I join products P
+                                                                             on I.prod_code = P.prod_code
+                                                                             join official_receipt O
+                                                                             on I.account_id = O.account_id
+                                                                             where I.event_id in (select event_id
+                                                                                                  from cart 
+                                                                                                  where account_id={$_SESSION['acc_id']})";
 
-                                        $orderstats_query="select receipt_id, transaction_date 
-                                                           from official_receipt
-                                                           order by receipt_id";
-                                        $or_result=@mysqli_query($dbc, $orderstats_query);
-                                        $or_row =mysqli_fetch_array($or_result, MYSQLI_ASSOC);
+                                        $orderstatus_result=mysqli_query($dbc, $orderstatus_query);
+                                        $orderstatus_row=mysqli_fetch_array($orderstatus_result, MYSQLI_ASSOC);
 
-                                        $price_query="select sum(P.prod_price) pricesum
-                                                      from inventory I join products P
-                                                      on I.prod_code = P.prod_code
-                                                      where I.event_id in (select C.event_id
-                                                                           from cart C
-                                                                           where C.receipt_id in (select receipt_id
-                                                                                                  from official_receipt
-                                                                                                  where account_id=".$_SESSION['acc_id']."))";
-                                        $price_result=mysqli_query($dbc, $price_query);
-                                        $price_row=mysqli_fetch_array($price_result, MYSQLI_ASSOC);
+                                        while($orderstatus_row){
+                                            echo "<tr>";
+                                            echo "<td>".$orderstatus_row['receipt_id']."</td>";
+                                            echo "<td>".$orderstatus_row['transaction_date']."</td>";
+                                            echo "<td>".$orderstatus_row['total_price']."</td>";
+                                            echo "<td>
+                                                    <form action='specificorderdetails.php' method='get'>
+                                                        <button class='btn btn-default btn-xs' name='specific-order' value='".$orderstatus_row['receipt_id']."'>View</button>
+                                                    </form>
+                                                  </td>";
+                                            echo "<td>  
+                                                    <button type='button' class='btn btn-default btn-xs' data-toggle='modal' data-target='#confirmModal'>Received orders </button>
+                                                  </td>";
+                                            echo "</tr>";
 
-                                        while($or_row && $price_row){
-
-                                            echo "<th>".$or_row['receipt_id']."</th>";
-                                            echo "<td>".$or_row['transaction_date']."</td>";
-                                            echo "<td>".$price_row['pricesum']."</td>";
-                                            echo "<td> To be continued </td>";
-
-                                            $or_row =mysqli_fetch_array($or_result, MYSQLI_ASSOC);
-                                            $price_row=mysqli_fetch_array($price_result, MYSQLI_ASSOC);
+                                            $orderstatus_row=mysqli_fetch_array($orderstatus_result, MYSQLI_ASSOC);
                                         }
-
                                     ?>
                                 </tbody>
                             </table>
+                            <!-- modal for confirmation when order is received -->
+                            <div id="confirmModal" class="modal fade" role="dialog">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                            <h3 class="modal-title">Thank you for buying from Enchanted Kingdom!</h3>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form action="">
+                                                <div class="form-group">
+                                                    <label for="comment">Comment:</label>
+                                                    <textarea class="form-control" rows="4" name="modalcomment" id="comment"></textarea>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
                         </div>
                     </div>
                 </div>
