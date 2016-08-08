@@ -31,12 +31,45 @@
 
 <?php
 require_once('/header.php');
+
+$tobedelivered = array();
+$orderfilter_receipt_query="select * from official_receipt";
+$orderfilter_receipt_result=mysqli_query($dbc, $orderfilter_receipt_query);
+$orderfilter_receipt_row=mysqli_fetch_array($orderfilter_receipt_result, MYSQLI_ASSOC);
+
+while($orderfilter_receipt_row){
+
+  $orderfilter_order_query="select I.event_id, I.event_status
+                            from inventory I join official_receipt O
+                                             on I.account_id = O.account_id
+                            where I.event_id in (select event_id
+                                                 from cart)
+                            and O.receipt_id = {$orderfilter_receipt_row['receipt_id']}";
+  $orderfilter_order_result=mysqli_query($dbc, $orderfilter_order_query);
+  $orderfilter_order_row=mysqli_fetch_array($orderfilter_order_result, MYSQLI_ASSOC);
+
+  while($orderfilter_order_row){
+
+    if($orderfilter_order_row['event_status']==0){
+
+      $unfinishedreceipt=$orderfilter_receipt_row['receipt_id'];
+    }
+
+    $orderfilter_order_row=mysqli_fetch_array($orderfilter_order_result, MYSQLI_ASSOC);
+  }
+
+  if(isset($unfinishedreceipt)){
+    $tobedelivered[] = $unfinishedreceipt;
+  }
+  
+  $orderfilter_receipt_row=mysqli_fetch_array($orderfilter_receipt_result, MYSQLI_ASSOC);
+}
 ?>
 <!-- page content -->
 <div class="right_col" role="main">
     <div class="page-title">
       <div class="title_left">
-        <h3>Users <small>Some examples to get you started</small></h3>
+        <h3>Undelivered Orders List</h3>
       </div>
     </div>
 
@@ -74,10 +107,10 @@ require_once('/header.php');
                     <table id="datatable" class="table table-striped table-bordered">
                       <thead>
                         <tr>
-                          <th>E-mail</th>
-                          <th>Username</th>
-                          <th>Contact Number</th>
-                          <th>Order History</th>
+                          <th>Order Number</th>
+                          <th>Date</th>
+                          <th>Total Price</th>
+                          <th>Action</th>
                         </tr>
                       </thead>
 
@@ -86,21 +119,38 @@ require_once('/header.php');
                         <?php
                         require_once('/connect.php');
 
-                        $query="select * from accounts where type='uac'";
-                        $result=mysqli_query($dbc,$query);
-                        while($row=mysqli_fetch_array($result,MYSQLI_ASSOC)){
+                        for($i=0; $i<count($tobedelivered); $i++){
+
+                        $shippinglist_query="select O.receipt_id, O.transaction_date, SUM(P.prod_price) as total_price 
+                                             from inventory I join products P
+                                                              on I.prod_code = P.prod_code
+                                                              join official_receipt O
+                                                              on I.account_id = O.account_id
+                                                              where I.event_id in (select event_id
+                                                                                   from cart)
+                                                              and O.receipt_id={$tobedelivered[$i]}
+                                             group by O.receipt_id
+                                             order by O.receipt_id desc";
+                        $shippinglist_result=mysqli_query($dbc,$shippinglist_query);
+
+                        while($shippinglist_row=mysqli_fetch_array($shippinglist_result,MYSQLI_ASSOC)){
                          ?>
                          <tr>
-                          <td><?php echo "{$row['email']}";?></td>
-                          <td><?php echo "{$row['username']}";?></td>
-                          <td><?php echo "{$row['contact_number']}";?></td>
+                          <td><?php echo "{$shippinglist_row['receipt_id']}";?></td>
+                          <td><?php echo "{$shippinglist_row['transaction_date']}";?></td>
+                          <td><?php echo "{$shippinglist_row['total_price']}";?></td>
                           <td>
-                              <form action="specific-user-history.php" method="get">
-                                <button class="btn btn-default btn-sm" name='specific-user' value="<?php echo "{$row['account_id']}";?>">View</button>
-                              </form>
+                            <form action="specificorderdetails.php" method="get">
+                              <button class="btn btn-default btn-sm" name='specificorder' value="<?php echo "{$shippinglist_row['receipt_id']}";?>">View Order</button>
+                            </form>
+                          </td>
+                          <td>
+                            <form action="delivery.php" method="post">
+                              <button class="btn btn-default btn-sm" name="deliverorder" value="<?php echo "{$shippinglist_row['receipt_id']}";?>">Deliver Order</button>
+                            </form>
                           </td>
                         </tr>
-                        <?php } ?>
+                        <?php } }?>
                       </tbody>
                     </table>
                   </div>
@@ -197,7 +247,6 @@ require_once('/header.php');
         };
       }();
 
-      $('#datatable').dataTable();
       $('#datatable-keytable').DataTable({
         keys: true
       });

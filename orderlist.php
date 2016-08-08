@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <!-- Meta, title, CSS, favicons, etc. -->
@@ -32,11 +33,12 @@
 <?php
 require_once('/header.php');
 ?>
+
 <!-- page content -->
 <div class="right_col" role="main">
     <div class="page-title">
       <div class="title_left">
-        <h3>Users <small>Some examples to get you started</small></h3>
+        <h3>Order List</h3>
       </div>
     </div>
 
@@ -49,7 +51,6 @@ require_once('/header.php');
 
         <div class="x_panel">
           <div class="x_title">
-            <h2>Default Example <small>Users</small></h2>
             <ul class="nav navbar-right panel_toolbox">
               <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
               </li>
@@ -74,38 +75,53 @@ require_once('/header.php');
                     <table id="datatable" class="table table-striped table-bordered">
                       <thead>
                         <tr>
-                          <th>E-mail</th>
+                          <th>Order Number</th>
                           <th>Username</th>
-                          <th>Contact Number</th>
-                          <th>Order History</th>
+                          <th>Date</th>
+                          <th>Price</th>
+                          <th>Actions</th>
                         </tr>
                       </thead>
 
-                      
                       <tbody>
-                        <?php
-                        require_once('/connect.php');
+                          <?php
 
-                        $query="select * from accounts where type='uac'";
-                        $result=mysqli_query($dbc,$query);
-                        while($row=mysqli_fetch_array($result,MYSQLI_ASSOC)){
-                         ?>
-                         <tr>
-                          <td><?php echo "{$row['email']}";?></td>
-                          <td><?php echo "{$row['username']}";?></td>
-                          <td><?php echo "{$row['contact_number']}";?></td>
-                          <td>
-                              <form action="specific-user-history.php" method="get">
-                                <button class="btn btn-default btn-sm" name='specific-user' value="<?php echo "{$row['account_id']}";?>">View</button>
-                              </form>
-                          </td>
-                        </tr>
-                        <?php } ?>
+                              $orderlist_query="select O.receipt_id, O.transaction_date, A.username, SUM(P.prod_price) as total_price 
+                                                from inventory I join products P
+                                                                 on I.prod_code = P.prod_code
+                                                                 join official_receipt O
+                                                                 on I.account_id = O.account_id
+                                                                 join accounts A 
+                                                                 on I.account_id = A.account_id
+                                                                 where I.event_id in (select event_id
+                                                                                      from cart)
+                                                group by receipt_id
+                                                order by receipt_id desc";
+                              $orderlist_result=mysqli_query($dbc, $orderlist_query);
+                              $orderlist_row=mysqli_fetch_array($orderlist_result, MYSQLI_ASSOC);
+
+                              while($orderlist_row){
+
+                                echo "<tr>";
+                                echo "<th>".$orderlist_row['receipt_id']."</th>";
+                                echo "<th>".$orderlist_row['username']."</th>";
+                                echo "<th>".$orderlist_row['transaction_date']."</th>";
+                                echo "<th>".$orderlist_row['total_price']."</th>";
+                                echo "<th>
+                                        <form action='specificorderdetails.php' method='get'>
+                                          <button class='btn btn-default btn-sm' name='specificorder' value='".$orderlist_row['receipt_id']."'>View Order</button>
+                                        </form>
+                                      </th>";
+                                echo "</tr>";
+
+                                $orderlist_row=mysqli_fetch_array($orderlist_result, MYSQLI_ASSOC);
+                              }
+                          ?>
                       </tbody>
                     </table>
                   </div>
                 </div>
-              </div>
+              </div>         
             </div>
         </div>
         <!-- /page content -->
@@ -197,7 +213,6 @@ require_once('/header.php');
         };
       }();
 
-      $('#datatable').dataTable();
       $('#datatable-keytable').DataTable({
         keys: true
       });
@@ -220,4 +235,6 @@ require_once('/header.php');
     });
 </script>
 </body>
+</html>
+
 </html>
