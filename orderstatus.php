@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-require_once('/connect.php');
 require_once('/navbar.php');
 
 ?>
@@ -67,7 +66,7 @@ require_once('/navbar.php');
                                                     </form>
                                                   </td>";
                                             echo "<td>  
-                                                    <button type='button' class='btn btn-default btn-xs' data-toggle='modal' data-target='#confirmModal'>Received orders </button>
+                                                    <button type='button' class='btn btn-default btn-xs' data-toggle='modal' data-value='".$orderstatus_row['receipt_id']."' id='receiptNum' data-target='#confirmModal'>Received orders </button>
                                                   </td>";
                                             echo "</tr>";
 
@@ -85,15 +84,19 @@ require_once('/navbar.php');
                                             <h3 class="modal-title">Thank you for buying from Enchanted Kingdom!</h3>
                                         </div>
                                         <div class="modal-body">
-                                            <form action="">
+                                            <form action="comment.php" method="post">
                                                 <div class="form-group">
                                                     <label for="comment">Comment:</label>
-                                                    <textarea class="form-control" rows="4" name="modalcomment" id="comment"></textarea>
+                                                    <textarea class="form-control" rows="4" name="content" id="comment"></textarea>
                                                 </div>
-                                            </form>
+                                            </form
                                         </div>
                                         <div class="modal-footer">
-                                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                            <form action="receiveorder.php" method="post">
+                                                <input type="hidden" id="orderNum" name="receiptnumber"/>
+                                                <button type="submit" class="btn btn-default" name="sumbit">Submit</button>
+                                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                            </form>
                                         </div>
                                     </div>
                                 </div>
@@ -113,3 +116,14 @@ require_once('/navbar.php');
 require_once('/footer.php');
 
 ?>
+
+<script>
+
+        $(document).ready(function() {
+            $("#receiptNum").on("click", function() {
+                console.log($(this).data("value"));
+                $("#orderNum").attr("value", $(this).data("value"));
+            });
+        });
+
+</script>
