@@ -1,3 +1,7 @@
+ALTER TABLE `ek_finaldb`.`official_receipt` 
+ADD COLUMN `is_discounted` VARCHAR(3) NOT NULL AFTER `account_id`,
+ADD COLUMN `amt_discounted` DECIMAL(10,2) NULL AFTER `is_discounted`;
+
 ALTER TABLE `ek_finaldb`.`accounts` 
 CHANGE COLUMN `first_name` `first_name` VARCHAR(255) NULL ,
 CHANGE COLUMN `last_name` `last_name` VARCHAR(255) NULL ;
