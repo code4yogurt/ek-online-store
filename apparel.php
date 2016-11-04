@@ -3,15 +3,22 @@
       <a href='accessories.php'>ACCESSORIES | </a>
       <a href='drinkware.php'>DRINK WARE | </a>
       <a href='toys.php'>TOYS | </a>
+<b>APPAREL:</b>    <br>
+ <a href='shirts.php'>Shirts</a><br>
+ <a href='shorts.php'>Shorts</a><br>
+ <a href='hoodies.php'>Hoodies</a><br>
+ <a href='footwear.php'>Footwear</a><br>
+  
+
 
 <?php
-
 session_start();
 require_once('../mysql_connect.php');
 
-$_SESSION['checkout']=0;
 
 if (isset($_SESSION['type'])) {
+        
+	
         echo"<a href='myaccount.php'>My Account | </a>";
 	echo"<a href='cart.php'>Cart | </a>";
 	echo"<a href='logout.php'>Log out | </a>";
@@ -21,10 +28,30 @@ else{
 	<a href='login.php'>Log In</a>";
 }
 
+if (isset($_POST['filter'])){
+$apparel=$_POST['apparel'];
 
-$query="select * from products where status=1 AND prod_id IN (select prod_id from featured where featured_end IS NULL)";
+if($apparel=='shirts'){
+$query="select * from products where subcategory='shirts'";
 $result=mysqli_query($dbc,$query);
-echo"<br><br><b>Featured Items</b>";
+}
+if($apparel=='shorts'){
+$query="select * from products where subcategory='shorts'";
+$result=mysqli_query($dbc,$query);
+}
+if($apparel=='footwear'){
+$query="select * from products where subcategory='hoodies'";
+$result=mysqli_query($dbc,$query);
+}
+if($apparel=='shirts'){
+$query="select * from products where subcategory='footwear'";
+$result=mysqli_query($dbc,$query);
+}
+}
+else{
+$query="select * from products where category='apparel' AND status=1";
+$result=mysqli_query($dbc,$query);
+}
 echo "<table border='1'>";
 
 
@@ -58,14 +85,14 @@ $counter=0;
 
 }
 echo '</table>';
-
-
-
 ?>
 <?php
 if(isset($_GET['submit'])){
  header("Location: http://".$_SERVER['HTTP_HOST'].  dirname($_SERVER['PHP_SELF'])."/specificitem.php");
 
 }
+
+
 ?>
+
 

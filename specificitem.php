@@ -1,27 +1,17 @@
-<html>
-<title>EK Store</title>
-<body>
-<div style='width:100%'>
-  <div style='background-color:#b5dcb3; width:100%'>
-      <h1><a href='http://www.enchantedkingdom.ph'>Enchanted Kingdom</a></h1>
-  </div>
- <div style='width:100%'>
-  <div style='background-color:#b5dcb3; width:100%' align='center'>
+
       <a href='index.php'>| EK Store | </a>
       <a href='apparel.php'>APPAREL | </a>
       <a href='accessories.php'>ACCESSORIES | </a>
       <a href='drinkware.php'>DRINK WARE | </a>
       <a href='toys.php'>TOYS | </a>
-  </div>
-<div style="background-color:#aaa;height:500px;width:150px;float:left;">
-
-
-  </div>
-
 <?php
 session_start();
+
 $item=$_GET['submit'];
 require_once('../mysql_connect.php');
+
+$_SESSION['checkout']=0;
+
 $ip= $_SERVER['REMOTE_ADDR'];
 $query="select status from products where prod_name='$item'";
 $result=mysqli_query($dbc,$query);
@@ -34,10 +24,10 @@ header("Location: http://".$_SERVER['HTTP_HOST'].  dirname($_SERVER['PHP_SELF'])
 
 }
 else{
-$query="select prod_code from products where prod_name='$item'";
+$query="select prod_id from products where prod_name='$item'";
 $result=mysqli_query($dbc,$query);
 while($row=mysqli_fetch_array($result,MYSQLI_ASSOC)){
-$prod_code= $row['prod_code'];
+$prod_code= $row['prod_id'];
 }
 $_SESSION['prod_code']=$prod_code;
 
@@ -89,15 +79,15 @@ echo $row['prod_desc'];
 echo '<br>PHP: ';
 echo $row['prod_price'];
 $name=$row['prod_name'];
-$id=$row['prod_code'];
+$id=$row['prod_id'];
 }
 
-$query="SELECT SUM(quantity) from inventory where prod_code =$id and change_type = 'in'";
+$query="SELECT SUM(quantity) from inventory where prod_id =$id and change_type = 'in'";
 $result=mysqli_query($dbc,$query);
 while($row=mysqli_fetch_array($result,MYSQLI_ASSOC)){
 $n1=$row['SUM(quantity)'];
 }
-$query="SELECT SUM(quantity) from inventory where prod_code =$id and change_type = 'out'";
+$query="SELECT SUM(quantity) from inventory where prod_id =$id and change_type = 'out'";
 $result=mysqli_query($dbc,$query);
 while($row=mysqli_fetch_array($result,MYSQLI_ASSOC)){
 $n2=$row['SUM(quantity)'];
@@ -113,7 +103,7 @@ echo "<form action='$output' method='POST'>
 else{
 echo '<br>There are currently no stocks available';
 }
-$query="select username from accounts where account_id in(select account_id from official_receipt where account_id in(select account_id from cart where cart_status=0 AND event_id in (select event_id from inventory where prod_code='{$prod_code}')))";
+$query="select username from accounts where account_id in(select account_id from official_receipt where account_id in(select account_id from cart where cart_status=0 AND event_id in (select event_id from inventory where prod_id='{$prod_code}')))";
 $result=mysqli_query($dbc,$query);
 while($row=mysqli_fetch_array($result,MYSQLI_ASSOC)){
 $valid_user=$row['username'];

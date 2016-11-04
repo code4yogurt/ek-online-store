@@ -1,9 +1,42 @@
+
+      <a href='index.php'>| EK Store | </a>
+      <a href='apparel.php'>APPAREL | </a>
+      <a href='accessories.php'>ACCESSORIES | </a>
+      <a href='drinkware.php'>DRINK WARE | </a>
+      <a href='toys.php'>TOYS | </a>
 <?php
 session_start();
 
+require_once('../mysql_connect.php');
+
+$queryid="select account_id from accounts where username='{$_SESSION['username']}'";
+		$resultid=mysqli_query($dbc, $queryid);
+
+		while($row=mysqli_fetch_array($resultid,MYSQLI_ASSOC)){
+			$account_id=$row['account_id'];
+
+		}
+
+
+$count=0;
+$query="select cart_id from cart where account_id =$account_id and cart_status =1";
+		$result=mysqli_query($dbc, $query);
+		while($row=mysqli_fetch_array($result,MYSQLI_ASSOC)){
+		$cart_id=$row['cart_id'];
+		
+		$count=$count+1;	
+
+
+		}
+		if($count==0){
+			header("Location: http://".$_SERVER['HTTP_HOST'].  dirname($_SERVER['PHP_SELF'])."/index.php");
+		}
+
+
+
 if(isset($_POST['submit'])){
 
-	require_once('../mysql_connect.php');
+	
 
 	$message=NULL;
 
@@ -29,31 +62,58 @@ if(isset($_POST['submit'])){
 		$resultid=mysqli_query($dbc, $queryid);
 
 		while($row=mysqli_fetch_array($resultid,MYSQLI_ASSOC)){
-			$actid=$row['account_id'];
+			$account_id=$row['account_id'];
 		}
 
-		$datetime= date("Y-m-d H:i:s");
+		$date= date("Y-m-d");
 
-		$addor="insert into official_receipt (transaction_date, bank_deposit_code, deposited_money, account_id)
-				values ('{$datetime}','{$dc}','{$da}','{$actid}')";
-		$orresult=mysqli_query($dbc, $addor);
+		
+		$query2="insert into pending_payment (payment_code,payment_amt,payment_status,payment_date) values ('{$dc}','{$da}','0','{$date}')";
+		$result2=mysqli_query($dbc, $query2);
 
-		$getorid="select receipt_id from official_receipt where bank_deposit_code='$dc'";
-		$oridresult=mysqli_query($dbc, $getorid);
 
-		while($oridrow=mysqli_fetch_array($oridresult, MYSQLI_ASSOC)){
-			$orid=$oridrow['receipt_id'];
+		$query2="select payment_id from pending_payment where payment_code = $dc";
+		$result2=mysqli_query($dbc, $query2);
+		
+		while($row=mysqli_fetch_array($result2,MYSQLI_ASSOC)){
+			$payment_id=$row['payment_id'];
 		}
 
-		$cartorid="update cart set cart_status=0, receipt_id={$orid} where account_id = {$actid} AND cart_status=1";
+
+
+		$query="select cart_id from cart where account_id ='{$account_id}' and cart_status =1";
+		$result=mysqli_query($dbc, $query);
+
+		while($row=mysqli_fetch_array($result,MYSQLI_ASSOC)){
+			$cart_id=$row['cart_id'];
+
+		
+			$cartorid="update cart set cart_status=0,payment_id = $payment_id,cart_activity = 1 where cart_id=$cart_id";
 		$cartresult=mysqli_query($dbc, $cartorid);
+			
+
+
+		}
+		
+			$_SESSION['checkout']=1;
+		
+			header("Location: http://".$_SERVER['HTTP_HOST'].  dirname($_SERVER['PHP_SELF'])."/checkout_2.php");
+
+	
+			//INSERT EMAIL ON RECEIVED ORDER AND ON PENDING STATUS
 
 	} 
+
+
+
+
 }
 
 if(isset($message)){
 	echo "<font color='red'".$message.'</font>';
 }
+
+
 
 ?>
 
@@ -64,6 +124,9 @@ if(isset($message)){
 </style>
 
 <link rel="stylesheet" href="css/bootstrap.min.css">
+
+
+
 <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
 <fieldset><legend>BANK DETAILS</legend>
 
