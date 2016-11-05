@@ -1,15 +1,20 @@
 
-      <a href='index.php'>| EK Store | </a>
-      <a href='apparel.php'>APPAREL | </a>
-      <a href='accessories.php'>ACCESSORIES | </a>
-      <a href='drinkware.php'>DRINK WARE | </a>
-      <a href='toys.php'>TOYS | </a>
 <?php
 session_start();
 
 $item=$_GET['submit'];
 require_once('../mysql_connect.php');
+require_once('navbar.php');
+?>
 
+
+    <div id="all">
+
+        <div id="content">
+            <div class="container">
+
+
+<?php
 $_SESSION['checkout']=0;
 
 $ip= $_SERVER['REMOTE_ADDR'];
@@ -40,9 +45,7 @@ if (isset($_SESSION['type'])) {
 	while($row=mysqli_fetch_array($result,MYSQLI_ASSOC)){
 	$account_id=$row['account_id'];
 	}
-        echo"<a href='myaccount.php'>My Account | </a>";
-	echo"<a href='cart.php'>Cart | </a>";
-	echo"<a href='logout.php'>Log out | </a>";
+        
 
 	$output='add_cart.php';
 
@@ -57,8 +60,7 @@ if (isset($_SESSION['type'])) {
 	
 }
 else{
-	echo"<a href='creation.php'>Create Account</a>
-	<a href='login.php'>Log In</a>";
+	
 	$output='login.php';
 	$year1=date('Y');
   	$month1=date('m');
@@ -68,41 +70,97 @@ else{
 	$query="insert into product_view (prod_code,view_date,ip_address) values('{$prod_code}','{$date}','{$ip}')";
 	$result=mysqli_query($dbc,$query);
 }
-$query="select * from products where prod_name='$item'";
-$result=mysqli_query($dbc,$query);
 
-while($row=mysqli_fetch_array($result,MYSQLI_ASSOC)){
-
-echo "<h1>{$row['prod_name']}</h1><br>
-<img src='{$row['image']}' height='200 width='100''/><br>";
-echo $row['prod_desc'];
-echo '<br>PHP: ';
-echo $row['prod_price'];
-$name=$row['prod_name'];
-$id=$row['prod_id'];
-}
-
-$query="SELECT SUM(quantity) from inventory where prod_id =$id and change_type = 'in'";
+$query="SELECT SUM(quantity) from inventory where prod_id =$prod_code and change_type = 'in'";
 $result=mysqli_query($dbc,$query);
 while($row=mysqli_fetch_array($result,MYSQLI_ASSOC)){
 $n1=$row['SUM(quantity)'];
 }
-$query="SELECT SUM(quantity) from inventory where prod_id =$id and change_type = 'out'";
+$query="SELECT SUM(quantity) from inventory where prod_id =$prod_code and change_type = 'out'";
 $result=mysqli_query($dbc,$query);
 while($row=mysqli_fetch_array($result,MYSQLI_ASSOC)){
 $n2=$row['SUM(quantity)'];
 }
 $quantity=$n1-$n2;
-if($quantity>0){
-echo "<br>Add to Cart: ";
-echo "<form action='$output' method='POST'>
-<input type='submit' name='add_item' value='$name' />
-</form>
-";
+
+
+$query="select * from products where prod_name='$item'";
+$result=mysqli_query($dbc,$query);
+
+while($row=mysqli_fetch_array($result,MYSQLI_ASSOC)){
+?>
+ <div class="col-lg-9">
+                     
+
+                    <div class="row" id="productMain">
+                       
+
+                        <div class="col-lg-6">
+                            <div id="mainImage">
+                                <img src="<?php echo "{$row['image']}";?>" alt="" class="img-responsive">
+                            </div>
+
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="box">
+                                <h1 class="text-center"><?php echo "{$row['prod_name']}";?></h1>
+                                
+                                <p class="price">₱<?php echo "{$row['prod_price']}";?></p>
+                                <?php
+                                $name=$row['prod_name'];
+                                if(isset($_SESSION['type'])){
+                                	if($quantity>0){
+								
+									echo "<center><form action='$output' method='POST'>
+									<button type='submit' name='add_item' value='$name' class='btn btn-primary'><i class='fa fa-shopping-cart'></i>ADD TO CART</button>
+									</form></center>
+									";
+
+									}
+									else{
+									echo '<br><center>There are currently no stocks available</center>';
+									}	
+                                }
+                                else{
+                                	echo '<center>Login first to add to cart</center>';	
+                                }
+                                
+
+                                ?>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="box" id="details">
+                        <p>
+                            <h4>Product Information</h4>
+                            <p><?php echo "{$row['prod_desc']}";?>
+                        </p>
+                            
+                    </div>
+
+                
+
+                </div>
+
+                <!-- /.col-md-9 -->
+            </div>
+            <?php  ?>
+            <!-- /.container -->
+            
+        </div>
+
+            
+        <!-- /#content -->
+<?php
+
+$id=$row['prod_id'];
 }
-else{
-echo '<br>There are currently no stocks available';
-}
+
+
+
 $query="select username from accounts where account_id in(select account_id from official_receipt where account_id in(select account_id from cart where cart_status=0 AND event_id in (select event_id from inventory where prod_id='{$prod_code}')))";
 $result=mysqli_query($dbc,$query);
 while($row=mysqli_fetch_array($result,MYSQLI_ASSOC)){
@@ -147,4 +205,9 @@ while($row=mysqli_fetch_array($result,MYSQLI_ASSOC)){
 }
 ?>
 
+<?php
+require_once('footer.php');
+?>
+</body>
 
+</html>

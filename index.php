@@ -1,63 +1,101 @@
-      <a href='index.php'>| EK Store | </a>
-      <a href='apparel.php'>APPAREL | </a>
-      <a href='accessories.php'>ACCESSORIES | </a>
-      <a href='drinkware.php'>DRINK WARE | </a>
-      <a href='toys.php'>TOYS | </a>
 
 <?php
 
 session_start();
 require_once('../mysql_connect.php');
+require_once('navbar.php');
+?>
+ <div id="all">
+
+        <div id="content">
+            <div class="container">
+
+
+<?php
+require_once('/filter.php')
+?>
+<div class="col-md-9">
+                    <div class="box">
+                        <h1>Featured Items</h1>
+                        <p>Magical items available right now!</p>
+                    </div>
+
+                    <div class="box info-bar">
+                        <div class="row">
+                            <div class="col-sm-12 col-md-4 products-showing">
+                                
+                            </div>
+
+                            <div class="col-sm-12 col-md-8  products-number-sort">
+                                <div class="row">
+                                    <form class="form-inline">
+                                        <div class="col-md-6 col-sm-6">
+                                            <div class="products-number">
+                                                <strong>Show</strong>  <a href="#" class="btn btn-default btn-sm btn-primary">12</a>  <a href="#" class="btn btn-default btn-sm">24</a>  <a href="#" class="btn btn-default btn-sm">All</a> products
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-sm-6">
+                                            <div class="products-sort-by">
+                                                <strong>Sort by</strong>
+                                                <select name="sort-by" class="form-control">
+                                                    <option>Price</option>
+                                                    <option>Name</option>
+                                                    <option>Sales first</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row products">
+<?php
+
 
 $_SESSION['checkout']=0;
 
-if (isset($_SESSION['type'])) {
-        echo"<a href='myaccount.php'>My Account | </a>";
-	echo"<a href='cart.php'>Cart | </a>";
-	echo"<a href='logout.php'>Log out | </a>";
-}
-else{
-	echo"<a href='creation.php'>Create Account</a>
-	<a href='login.php'>Log In</a>";
-}
+
 
 
 $query="select * from products where status=1 AND prod_id IN (select prod_id from featured where featured_end IS NULL)";
 $result=mysqli_query($dbc,$query);
-echo"<br><br><b>Featured Items</b>";
-echo "<table border='1'>";
 
 
-$counter=0;
+
 while($row=mysqli_fetch_array($result,MYSQLI_ASSOC)){
-
-$counter=$counter+1;
-
-if($counter==1){
-echo "<tr>";
-}
-
-echo"<td width=\"10%\"><div align=\"center\">
-<img src='{$row['image']}' height='100' width='100'/>
-";
 ?>
-<form action="specificitem.php" method="GET">
+
+ <div class="col-md-4 col-sm-6">
+                            <div class="product">
+                                
+                                
+                                    <img src="<?php echo"{$row['image']}";?>" alt="" class="img-responsive">
+                                </a>
+                                <div class="text">
+                                    
+                                   
+                
+                                    <form action="specificItem.php" method="GET">
+                                        <p class="buttons">
+                                        <input type='submit'  class="btn btn-primary" name="submit"value="<?php echo"{$row['prod_name']}";?>">
+                                    </form>
+                                    </p>
+                                     <p class="price">₱<?php echo "{$row['prod_price']}";?></p>
+                                </div>
+                                <!-- /.text -->
+                            </div>
+                            <!-- /.product -->
+
+                        </div>
+                        <?php } ?>
+                        </div>
+                        <!-- /.col-md-4 -->
+                    </div>
+
 <?php
-echo"<input type='submit' name='submit' value='{$row['prod_name']}' />
-</form>
-{$row['prod_price']}
-</div></td>";
 
-if($counter==4){
-echo"</tr>";
-}
-
-if($counter==4){
-$counter=0;
-}
-
-}
-echo '</table>';
 
 
 
@@ -68,4 +106,44 @@ if(isset($_GET['submit'])){
 
 }
 ?>
+
+<div class="pages">
+
+                        <p class="loadMore">
+                            <a href="#" class="btn btn-primary btn-lg"><i class="fa fa-chevron-down"></i> Load more</a>
+                        </p>
+
+                        <ul class="pagination">
+                            <li><a href="#">&laquo;</a>
+                            </li>
+                            <li class="active"><a href="#">1</a>
+                            </li>
+                            <li><a href="#">2</a>
+                            </li>
+                            <li><a href="#">3</a>
+                            </li>
+                            <li><a href="#">4</a>
+                            </li>
+                            <li><a href="#">5</a>
+                            </li>
+                            <li><a href="#">&raquo;</a>
+                            </li>
+                        </ul>
+                    </div>
+
+
+                </div>
+                <!-- /.col-md-9 -->
+            </div>
+            <!-- /.container -->
+        </div>
+        <!-- /#content -->
+
+
+<?php
+require_once('footer.php');
+?>
+</body>
+
+</html>
 

@@ -23,14 +23,7 @@
 
                         <hr>
 
-                        <h4>User section</h4>
-
-                        <ul>
-                            <li><a href="#" data-toggle="modal" data-target="#login-modal">Login</a>
-                            </li>
-                            <li><a href="register.html">Regiter</a>
-                            </li>
-                        </ul>
+                        
 
                         <hr class="hidden-md hidden-lg hidden-sm">
 
@@ -43,13 +36,11 @@
 
                         <h4>Where to find us</h4>
 
-                        <p><strong>Obaju Ltd.</strong>
-                            <br>13/25 New Avenue
-                            <br>New Heaven
-                            <br>45Y 73J
-                            <br>England
+                        <p><strong>Enchanted Kingdom</strong>
+                            <br>San Lorenzo Rd
+                            <br>Laguna, Sta. Rosa
                             <br>
-                            <strong>Great Britain</strong>
+                            <strong>Philippines</strong>
                         </p>
 
                         <a href="contact.html">Go to contact page</a>
@@ -81,7 +72,7 @@
         <div id="copyright">
             <div class="container">
                 <div class="col-md-6">
-                    <p class="pull-left">© 2015 Your name goes here.</p>
+                    <p class="pull-left">© 2016 Matthew Cabigas | Carlos Dignadice | Joshua Macuja | Job Julag-ay</p>
 
                 </div>
                 <div class="col-md-6">

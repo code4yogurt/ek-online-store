@@ -1,8 +1,21 @@
 	<?php
 session_start();
+require_once('../mysql_connect.php');
+require_once('navbar.php');
+?>
 
+<div id="all">
+
+        <div id="content">
+            <div class="container">
+
+
+
+
+<?php
 if(isset($_POST['submit'])){
-	require_once('../mysql_connect.php');
+	
+
 
 	$message=NULL;
 
@@ -138,7 +151,6 @@ if(isset($message)){
 	}
 </style>
 
-<link rel="stylesheet" href="css/bootstrap.min.css">
 <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
 <fieldset><legend>ACCOUNT CREATION</legend>
 
@@ -192,3 +204,11 @@ if(isset($message)){
 <input type="submit" class="btn btn-default" name="submit" value="Sign-Up"/>
 </div>
 </form>
+<br><br><br>
+</div>
+<?php
+require_once('footer.php');
+?>
+</body>
+
+</html>

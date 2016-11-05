@@ -16,8 +16,8 @@ require_once('/filter.php')
 ?>
 <div class="col-md-9">
                     <div class="box">
-                        <h1>Footwear</h1>
-                        <p>All the slippers, shoes, and sandals from Enchanted Kingdom!</p>
+                        <h1>Drinkware</h1>
+                        <p>Everything from mugs, tumblers, and shotglasses!</p>
                     </div>
 
                     <div class="box info-bar">
@@ -59,7 +59,7 @@ $_SESSION['checkout']=0;
 
 
 
-$query="select * from products where status=1 AND subcategory='footwear'";
+$query="select * from products where status=1 AND category='drinkware'";
 $result=mysqli_query($dbc,$query);
 
 

@@ -1,7 +1,10 @@
-<a href='index.php'>Home</a><br>
+
 <?php 
 session_start();
+?>
 
+
+<?php
 if(isset($_SESSION['badlogin'])){
 	if($_SESSION['badlogin']>=999){
 		header("Location: http://".$_SERVER['HTTP_HOST'].dirname($_SERVER['PHP_SELF'])."/blocked.php");
@@ -45,7 +48,6 @@ if(isset($_POST['submit'])){
 
 			$_SESSION['username']=$row['username'];
 			$_SESSION['type']=$row['type'];
-
 			if($row['type']=='uac'){
 				header("Location: http://".$_SERVER['HTTP_HOST'].  dirname($_SERVER['PHP_SELF'])."/index.php");
 			}
@@ -57,6 +59,8 @@ if(isset($_POST['submit'])){
 			}
 
 			exit();
+
+			
 		}
 		else{
 			$message='Username and passwords do not match.';
@@ -80,13 +84,15 @@ if(isset($message)){
 
 ?>
 
+
+
 <style>
 	.form-group{
 		width:20em;
 	}
 </style>
 
-<link rel="stylesheet" href="css/bootstrap.min.css">
+
 <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
 <fieldset><legend>LOG-IN</legend>
 

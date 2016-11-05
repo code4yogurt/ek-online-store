@@ -3,7 +3,7 @@
 
 <body>
 
-	            <div class="col-lg-3">
+              <div class="col-lg-3">
 
                     <?php
                     
@@ -38,7 +38,7 @@
                         <div class="panel-body">
                             <ul class="nav nav-pills nav-stacked category-menu">
                                     <li class=''>
-                                    <a href="allApparel.php">Apparel <span class="badge pull-right"><?php echo "{$row['apparelCount']}";?></span></a>
+                                    <a href="apparel.php">Apparel <span class="badge pull-right"><?php echo "{$row['apparelCount']}";?></span></a>
                                     <ul>
                                         <li><a href="shirts.php">Shirts</a>
                                         </li>
@@ -52,7 +52,7 @@
                                 </li>
                                 <li>
                                    
-                                    <a href="allDrinkware.php">DrinkWare  <span class="badge pull-right"><?php echo "{$row1['drinkwareCount']}";?></span></a>
+                                    <a href="drinkware.php">DrinkWare  <span class="badge pull-right"><?php echo "{$row1['drinkwareCount']}";?></span></a>
                                     <ul>
                                         <li><a href="mugs.php">Mugs</a>
                                         </li>
@@ -63,7 +63,7 @@
                                     </ul>
                                 </li>
                                 <li>
-                                    <a href="allToys.php">Toys <span class="badge pull-right"><?php echo "{$row2['toysCount']}";?></span></a>
+                                    <a href="toys.php">Toys <span class="badge pull-right"><?php echo "{$row2['toysCount']}";?></span></a>
                                     <ul>
                                         <li><a href="plushies.php">Plushies</a>
                                         </li>
@@ -72,7 +72,7 @@
                                     </ul>
                                 </li>
                                 <li>
-                                    <a href="allAccessories.php">Accessories <span class="badge pull-right"><?php echo "{$row3['accessoriesCount']}";?></span></a>
+                                    <a href="accessories.php">Accessories <span class="badge pull-right"><?php echo "{$row3['accessoriesCount']}";?></span></a>
                                     <ul>
                                         <li><a href="bracelets.php">Bracelets</a>
                                         </li>
@@ -103,5 +103,5 @@
                     
                 </div>
 
-	</body>
-	</html>
+  </body>
+  </html>
