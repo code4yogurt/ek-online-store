@@ -2,7 +2,7 @@
 <?php
 
 require_once('../db_connect.php');
-require_once('navbar.php');
+require_once('nanbarCarlos.php');
 ?>
 <div id="all">
 
@@ -39,7 +39,7 @@ $user_id= $row['account_id'];
                            
                             <?php
                             /*This gets the number of items in your cart*/
-                            $query1='SELECT count(event_id) AS cartCount FROM cart WHERE account_id="$user_id" and cart_status="1" ';
+                            $query1="SELECT count(event_id) AS cartCount FROM cart WHERE account_id='{$user_id}' and cart_status='1' ";
                             $result1=mysqli_query($dbc,$query1);
                             while($row1=mysqli_fetch_array($result1,MYSQLI_ASSOC)){   
                             ?>
