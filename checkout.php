@@ -112,7 +112,7 @@ if(isset($_POST['submit'])){
 		
 	
 	//INSERT INTO PENDING PAYMENT LACKS THE ADDRESS------------------------	
-		$query2="insert into pending_payment (payment_code,payment_amt,payment_status,payment_date) values ('{$dc}','{$da}','0','{$date}')";
+		$query2="insert into pending_payment (payment_code,payment_amt,payment_status,payment_date,billing_address) values ('{$dc}','{$da}','0','{$date}','{$address}')";
 		$result2=mysqli_query($dbc, $query2);
 	//--------------------------------------------------------------------
 
@@ -137,10 +137,7 @@ if(isset($_POST['submit'])){
 			
 
 		}
-//OFFICIAL RECEIPT INSERT NOT COMPLETE
-		$query3="insert into official_receipt (transaction_date,account_id,is_discounted) values ('{$date}','{$account_id}','0','{$date}')";
-		$result3=mysqli_query($dbc, $query3);
-//------------------------------------------
+
 				
 			$_SESSION['checkout']=1;
 		
