@@ -1,13 +1,15 @@
-
-      <a href='index.php'>| EK Store | </a>
-      <a href='apparel.php'>APPAREL | </a>
-      <a href='accessories.php'>ACCESSORIES | </a>
-      <a href='drinkware.php'>DRINK WARE | </a>
-      <a href='toys.php'>TOYS | </a>
 <?php
 session_start();
 
 require_once('../mysql_connect.php');
+require_once('navbar.php');
+?>
+<div id="all">
+
+        <div id="content">
+            <div class="container">
+
+<?php
 
 $queryid="select account_id from accounts where username='{$_SESSION['username']}'";
 		$resultid=mysqli_query($dbc, $queryid);
@@ -55,6 +57,45 @@ if(isset($_POST['submit'])){
 	else{
 		$da=$_POST['depositamt'];
 	}
+	if(empty($_POST['unit'])){
+		$unit=FALSE;
+		$message='Enter the House/ Unit No.!';
+	}
+	else{
+		$unit=$_POST['unit'];
+	}
+	if(empty($_POST['street'])){
+		$street=FALSE;
+		$message='Enter the Street!';
+	}
+	else{
+		$street=$_POST['street'];
+	}
+	if(empty($_POST['town'])){
+		$town=FALSE;
+		$message='Enter the Town!';
+	}
+	else{
+		$town=$_POST['town'];
+	}
+	if(empty($_POST['state'])){
+		$state=FALSE;
+		$message='Enter the State!';
+	}
+	else{
+		$state=$_POST['state'];
+	}
+	if(empty($_POST['postcode'])){
+		$postcode=FALSE;
+		$message='Enter the amount Postcode!';
+	}
+	else{
+		$postcode=$_POST['postcode'];
+	}
+	
+	
+	
+	
 
 	if($dc && $da){
 	
@@ -67,10 +108,13 @@ if(isset($_POST['submit'])){
 
 		$date= date("Y-m-d");
 
+		$address = $unit.' '.$street.', '.$town.', '.$state.' '.$postcode;
 		
+	
+	//INSERT INTO PENDING PAYMENT LACKS THE ADDRESS------------------------	
 		$query2="insert into pending_payment (payment_code,payment_amt,payment_status,payment_date) values ('{$dc}','{$da}','0','{$date}')";
 		$result2=mysqli_query($dbc, $query2);
-
+	//--------------------------------------------------------------------
 
 		$query2="select payment_id from pending_payment where payment_code = $dc";
 		$result2=mysqli_query($dbc, $query2);
@@ -92,9 +136,12 @@ if(isset($_POST['submit'])){
 		$cartresult=mysqli_query($dbc, $cartorid);
 			
 
-
 		}
-		
+//OFFICIAL RECEIPT INSERT NOT COMPLETE
+		$query3="insert into official_receipt (transaction_date,account_id,is_discounted) values ('{$date}','{$account_id}','0','{$date}')";
+		$result3=mysqli_query($dbc, $query3);
+//------------------------------------------
+				
 			$_SESSION['checkout']=1;
 		
 			header("Location: http://".$_SERVER['HTTP_HOST'].  dirname($_SERVER['PHP_SELF'])."/checkout_2.php");
@@ -108,7 +155,7 @@ if(isset($_POST['submit'])){
 
 
 }
-
+//------------------------------------------------------------------------------------------------------------------------------------
 if(isset($message)){
 	echo "<font color='red'".$message.'</font>';
 }
@@ -123,7 +170,6 @@ if(isset($message)){
 	}
 </style>
 
-<link rel="stylesheet" href="css/bootstrap.min.css">
 
 
 
@@ -141,7 +187,43 @@ if(isset($message)){
 	<input type='text' name='depositamt' class='form-control' size='20' maxlength='30' />
 </div>
 
-<input type='submit' class='btn btn-default' name='submit' value='Checkout'/><br><br>
 
 </div>
+<fieldset><legend>DELIVERY ADDRESS</legend>
+<div class='form-group'>
+	<label for='unit'>House/ Unit No.</label>
+	<input type='text' name='unit' class='form-control' size='20' maxlength='15' />
+</div>
+<div class='form-group'>
+	<label for='street'>Street/ Building</label>
+	<input type='text' name='street' class='form-control' size='20' maxlength='50' />
+</div>
+<div class='form-group'>
+	<label for='town'>Town/ City</label>
+	<input type='text' name='town' class='form-control' size='20' maxlength='40' />
+</div>
+<div class='form-group'>
+	<label for='state'>State/ County</label>
+	<input type='text' name='state' class='form-control' size='20' maxlength='40' />
+</div>
+<div class='form-group'>
+	<label for='postcode'>Postcode / ZIP</label>
+	<input type='text' name='postcode' class='form-control' size='20' maxlength='10' />
+</div>
+<input type='submit' class='btn btn-primary' name='submit' value='Checkout'/><br><br>
+
+
+
+
 </form>
+
+
+</div>
+<br><br><br><br>
+
+<?php
+require_once('footer.php');
+?>
+</body>
+
+</html>
