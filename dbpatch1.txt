@@ -8,3 +8,8 @@ CHANGE COLUMN `last_name` `last_name` VARCHAR(255) NULL ;
 
 ALTER TABLE `ek_finaldb`.`inventory` 
 CHANGE COLUMN `prod_code` `prod_id` INT(11) NOT NULL ;
+
+ALTER TABLE `ek_finaldb`.`pending_payment` 
+ADD COLUMN `billing_address` VARCHAR(255) NULL AFTER `payment_date`;
+
+
