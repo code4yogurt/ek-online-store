@@ -31,8 +31,8 @@
 </head>
 
 <?php
-require_once('/connect.php');
-require_once('/header.php');
+	require_once('/connect.php');
+	require_once('/header.php');
 ?>
 
 <!-- page content -->
@@ -40,8 +40,16 @@ require_once('/header.php');
 
 	<?php
 
-		$specificuser = $_GET['specific-user'];
-		$user_query="select * from accounts where account_id='$specificuser'";
+		if(isset($_POST['payment-confirm'])){
+			$pmtconfirm_query = "update cart
+								 set cart_activity = 2
+								 where cart_id = {$_POST['payment-confirm']}";
+			$pmtconfirm_report = mysqli_query($dbc, $pmtconfirm_query);
+		}
+
+		$_SESSION['specificuser'] = $_GET['specific-user'];
+		
+		$user_query="select * from accounts where account_id={$_SESSION['specificuser']}";
 		$user_result=mysqli_query($dbc, $user_query);
 		$user_row=mysqli_fetch_array($user_result, MYSQLI_ASSOC);
 
@@ -76,6 +84,7 @@ require_once('/header.php');
 	<?php $user_row=mysqli_fetch_array($user_result, MYSQLI_ASSOC); } ?>
 
 	<div class="clearfix"></div>
+
 	<div class="row">
 		<div class="col-md-12 col-sm-12 col-xs-12">
 			<div class="x_panel">
@@ -107,70 +116,98 @@ require_once('/header.php');
                   		<tr>
                   			<th>Order Number</th>
                   			<th>Date</th>
-                  			<th>Product</th>
-                  			<th>Price</th>
-                  			<th>Status</th>
+                  			<th>Total Price</th>
+                  			<th>Payment Code</th>
+                  			<th>Payment Date</th>
+                   			<th>Status</th>
+                   			<th>Action</th>
+                   			<th></th>
                   		</tr>
                   	</thead>
                   	
                   	<tbody>
                   		<?php
-                  			$userhistory_query="select I. event_id, I.event_date, I.event_status, P.prod_name, P.prod_price
-												from inventory I join products P 
-												on I.prod_code = P.prod_code 
-												where I.event_id in (select C.event_id 
-					 												 from cart C
-					 												 where C.receipt_id in (select receipt_id
-																							from official_receipt
-                                            												where account_id='$specificuser'))
-																							order by event_id desc";
+                  			$userhistory_query="select C.cart_id, C.date, C.cart_activity, SUM(P.prod_price) as total_price, PP.payment_code, PP.payment_date
+												from inventory I join products P
+				 												 on I.prod_id = P.prod_id
+				 												 join cart C
+				 												 on I.event_id = C.event_id
+				 												 join pending_payment PP
+				 												 on C.payment_id = PP.payment_id
+												where I.account_id = {$_SESSION['specificuser']}
+												group by C.cart_id;";
                   			$userhistory_result=mysqli_query($dbc,$userhistory_query);
                   			$userhistory_row=mysqli_fetch_array($userhistory_result,MYSQLI_ASSOC);
 
                   			while($userhistory_row){
                   				
                   				echo "<tr>";
-                  				echo "<th>".$userhistory_row['event_id']."</th>";
-                  				echo "<th>".$userhistory_row['event_date']."</th>";
-                  				echo "<th>".$userhistory_row['prod_name']."</th>";
-                  				echo "<th>".$userhistory_row['prod_price']."</th>";
-                  				echo "<th>";
-                                if($userhistory_row['event_status'] == 0){
-                                  echo "<span class='label label-warning'>Paid";
-                                }
-                                else if($userhistory_row['event_status'] == 1){
-                                  echo "<span class='label label-info'>Delivered";
-                                }
-                                else if($userhistory_row['event_status'] == 2){
-                                  echo "<span class='label label-success'>Recieved";
-                                }
-                                echo "</th>";
-                  				echo "</tr>";
+                  				echo "<th>".$userhistory_row['cart_id']."</th>";
+                  				echo "<th>".$userhistory_row['date']."</th>";
+                  				echo "<th>".$userhistory_row['total_price']."</th>";
+                  				echo "<th>".$userhistory_row['payment_code']."</th>";
+                  				echo "<th>".$userhistory_row['payment_date']."</th>";
 
+                  				if($userhistory_row['cart_activity'] == 0){
+                                            echo "<td><span class='label label-default'>Unpaid</label></td>";
+                                        }
+                                        else if($userhistory_row['cart_activity'] == 1){
+                                            echo "<td><span class='label label-danger'>Pending</label></td>";
+                                        }
+                                        else if($userhistory_row['cart_activity'] == 2){
+                                            echo "<td><span class='label label-warning'>Not Delivered</label></td>";
+                                        }
+                                        else if($userhistory_row['cart_activity'] == 3){
+                                            echo "<td><span class='label label-info'>Delivered</label></td>";
+                                        }
+                                        else if($userhistory_row['cart_activity'] == 4){
+                                            echo "<td><span class='label label-success'>Received</label></td>";
+                                        }
+   								echo "<td> 
+                                        <form action='specificorderdetails.php' method='get'>
+                                            <button class='btn btn-default btn-xs' name='specific-order' value='".$userhistory_row['cart_id']."'>View</button>
+                                        </form>
+                                      </td>";
+
+                                // copy for modal conversion < data-toggle='modal'  data-target='#confirmModal' <-- modal ID >
+                  				if($userhistory_row['cart_activity'] == 1){
+                                    echo "<td>
+                                    		<form action='specific-user-history.php' method='post'>
+                                    			<button class='btn btn-default btn-xs' id='receiptNum' name='payment-confirm' value='".$userhistory_row['cart_id']."'>Confirm Payment</button>
+                                    		</form>
+                                    	  </td>";
+                                    echo "<button type='button' class='btn btn-default btn-xs' id='receiptNum'>Deny Payment</button></td>";
+                                }
+                                else if($userhistory_row['cart_activity'] > 1){
+                                    echo "<td><button type='button' class='btn btn-default btn-xs' data-toggle='modal' id='receiptNum' data-target='#confirmModal' disabled>Confirmed!</button></td>";
+                                }
+                                else{
+                                    echo "<td><button type='button' class='btn btn-default btn-xs' data-toggle='modal' id='receiptNum' data-target='#confirmModal' disabled>Confirm Payment</button>";
+                                    echo "<button type='button' class='btn btn-default btn-xs' data-toggle='modal' id='receiptNum' data-target='#confirmModal' disabled>Deny Payment</button></td>";
+
+                                }
+
+                                echo "</tr>";
                   				$userhistory_row=mysqli_fetch_array($userhistory_result,MYSQLI_ASSOC);
-
                   			}
                   		?>
                   		</tbody>
                   	</table>
-                  </div>
-              </div>
-          </div>  
-      </div>
-  </div>
+                  	</div>
+              	</div>
+          	</div>  
+      	</div>
+  	</div>
   <!-- /page content -->
 
   <!-- footer content -->
-  <footer>
-  	<div class="pull-right">
-  		Enchanted Kingdom - Bootstrap Admin 
-  	</div>
+  	<footer>
+
+  	<div class="pull-right">Enchanted Kingdom - Bootstrap Admin </div>
   	<div class="clearfix"></div>
-  </footer>
+
+  	</footer>
   <!-- /footer content -->
-
-
-
 </div>
 
 
