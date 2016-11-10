@@ -1,3 +1,9 @@
+ALTER TABLE `ek_finaldb`.`products` 
+CHANGE COLUMN `category` `category` VARCHAR(255) NOT NULL AFTER `prod_price`,
+CHANGE COLUMN `subcategory` `subcategory` VARCHAR(255) NOT NULL AFTER `category`,
+ADD COLUMN `item_size` VARCHAR(1) NULL DEFAULT NULL AFTER `prod_desc`;
+
+
 ALTER TABLE `ek_finaldb`.`official_receipt` 
 ADD COLUMN `is_discounted` VARCHAR(3) NOT NULL AFTER `account_id`,
 ADD COLUMN `amt_discounted` DECIMAL(10,2) NULL AFTER `is_discounted`;
