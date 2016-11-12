@@ -47,7 +47,10 @@
 			$pmtconfirm_report = mysqli_query($dbc, $pmtconfirm_query);
 		}
 
-		$_SESSION['specificuser'] = $_GET['specific-user'];
+		if(isset($_GET['specific-user'])){
+			$_SESSION['specificuser'] = $_GET['specific-user'];
+		}
+		
 		
 		$user_query="select * from accounts where account_id={$_SESSION['specificuser']}";
 		$user_result=mysqli_query($dbc, $user_query);
@@ -174,9 +177,9 @@
                                     echo "<td>
                                     		<form action='specific-user-history.php' method='post'>
                                     			<button class='btn btn-default btn-xs' id='receiptNum' name='payment-confirm' value='".$userhistory_row['cart_id']."'>Confirm Payment</button>
-                                    		</form>
-                                    	  </td>";
-                                    echo "<button type='button' class='btn btn-default btn-xs' id='receiptNum'>Deny Payment</button></td>";
+                                    			<button type='button' class='btn btn-default btn-xs' id='receiptNum'>Deny Payment</button>
+                                			</form>
+                        			  	</td>";
                                 }
                                 else if($userhistory_row['cart_activity'] > 1){
                                     echo "<td><button type='button' class='btn btn-default btn-xs' data-toggle='modal' id='receiptNum' data-target='#confirmModal' disabled>Confirmed!</button></td>";
