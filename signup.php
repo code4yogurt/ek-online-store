@@ -109,7 +109,7 @@ if(isset($_POST['register'])){
                 $_SESSION['signup-flag']=1;
                 $_SESSION['is_loggedin']=1;
 
-                $login_query = "select * from accounts where username'$un' and password='$encpw'";
+                $login_query = "select * from accounts where username='$un' and password='$encpw'";
                 $login_result=mysqli_query($dbc,$login_query);
                 $login_row=mysqli_fetch_array($login_result, MYSQLI_ASSOC);
 
