@@ -1,5 +1,7 @@
 <?php
 
+<?php
+
 session_start();
 require_once('/connect.php');
 
@@ -69,55 +71,25 @@ if(isset($_POST['login'])){
 
 if(isset($_POST['register'])){
 
-        //checks if email field is empty
-    if(empty($_POST['reg-email'])){
-        $em=FALSE;
-        $em_msg="You forgot to enter your e-mail!";
-    }
-    else{
-        $em=$_POST['reg-email'];
-    }
+    //EMAIL
+    $em=$_POST['reg-email'];
 
-        //checks if username field is empty
-    if(empty($_POST['reg-username'])){
-        $un=FALSE;
-        $un_msg="You forgot to enter your username!";
-    }
-    else{
-        $un=$_POST['reg-username'];
-    }
+    //USERNAME
+    $un=$_POST['reg-username'];
 
-        //checks if password field is empty
-    if(empty($_POST['reg-password'])){
-        $pw=FALSE;
-        $pw_msg="You forgot to enter your password!";
-    }
-    else{
-        $pw=$_POST['reg-password'];
-    }
+    //PW & PW VERIFICATION
+    $pw=$_POST['reg-pass'];
+    $pwv=$_POST['pwverify'];
 
-        //checks if password verification field is empty
-    if(empty($_POST['pwverify'])){
-        $pwv=FALSE;
-    }
-    else{
-        $pwv=$_POST['pwverify'];
-    }
+    //BIRTHDATE
+    $bd=$_POST['reg-birthday'];
 
-        //checks if gender field is empty
-    if(empty($_POST['reg-contactno'])){
-        $cn=FALSE;
-        $message='You forgot to select a gender!';
-    }
-    else{
-        $cn=$_POST['reg-contactno'];
-    }
-
-
+    //CONTACT NO
+    $cn=$_POST['reg-contactno'];
 
         /* VALUES - em:E-MAIL; un:USERNAME; pw:PASSWORD; pwv:PASSWORD VERIFICATION; gd:GENDER;
         Makes sure all the fields have are not empty */
-        if($em && $un && $pw && $pwv && $cn){
+        if($em && $un && $pw && $pwv && $cn && $bd){
 
         //checks if password matches the password verification
             if($pw!=$pwv){
@@ -128,14 +100,20 @@ if(isset($_POST['register'])){
                 $salt = sha1(md5($pw));
                 $encpw = md5($pw).$salt;
 
-                $query = "insert into accounts (email, username, password, contact_number, type)
-                values ('{$em}', '{$un}', '{$encpw}', '{$cn}', 'uac')";
+                $signup_query = "insert into accounts (email, username, password, birthdate, contact_number, type)
+                values ('{$em}', '{$un}', '{$encpw}', '{$bd}', '{$cn}', 'uac')";
 
-                $result=@mysqli_query($dbc,$query);
+                $signup_result=@mysqli_query($dbc,$signup_query);
 
                 $_SESSION['signup-msg']="New account has been added!";
                 $_SESSION['signup-flag']=1;
                 $_SESSION['is_loggedin']=1;
+
+                $login_query = "select * from accounts where username'$un' and password='$encpw'";
+                $login_result=mysqli_query($dbc,$login_query);
+                $login_row=mysqli_fetch_array($login_result, MYSQLI_ASSOC);
+
+                $_SESSION['acc_id'] = $login_row['account_id'];
 
                 header("Location: http://".$_SERVER['HTTP_HOST'].  dirname($_SERVER['PHP_SELF'])."/index.php");
             }
@@ -143,12 +121,12 @@ if(isset($_POST['register'])){
         else{
             echo "<font color=r'red'> Please try again! </font>";
         }
-    }
+    }   
 
     ?>
 
     <?php
-    require_once('/navbar.php');
+        require_once('/navbar.php');
     ?>
 
    <!-- *** NAVBAR END *** -->
@@ -161,42 +139,43 @@ if(isset($_POST['register'])){
             <div class="col-md-12">
 
                 <ul class="breadcrumb">
-                    <li><a href="#">Home</a>
-                    </li>
+                    <li><a href="#">Home</a></li>
                     <li>New account / Sign in</li>
                 </ul>
-
             </div>
 
             <div class="col-md-6">
                 <div class="box">
                     <h1>New account</h1>
 
-                    <p class="lead">Not our registered customer yet?</p>
+                    <p class="lead">Not registered yet?</p>
 
                     <hr>
-
                     <form action="<?php echo $_SERVER["PHP_SELF"]; ?>" method="post">
 
                         <div class="form-group">
                             <label for="email">Email</label>
-                            <input type="text" class="form-control" name="reg-email">
+                            <input type="email" class="form-control" name="reg-email" required>
                         </div>
                         <div class="form-group">
                             <label for="name">Username</label>
-                            <input type="text" class="form-control" name="reg-username">
+                            <input type="text" class="form-control" name="reg-username" required>
                         </div>
                         <div class="form-group">
                             <label for="password">Password</label>
-                            <input type="password" class="form-control" name="reg-password">
+                            <input type="password" class="form-control" name="reg-pass" required>
                         </div>
                         <div class="form-group">
                             <label for="pwverify">Confirm Password</label>
-                            <input type="password" class="form-control" name="pwverify">
+                            <input type="password" class="form-control" name="pwverify" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="birthdate">Birthdate</label>
+                            <input type="date" class="form-control" name="reg-birthday" required>
                         </div>
                         <div class="form-group">
                             <label for="contactno">Contact Number</label><br>
-                            <input type="text" class="form-control" name="reg-contactno">
+                            <input type="text" class="form-control" name="reg-contactno" required>
                         </div> 
                         <div class="text-center">
                             <button type="submit" class="btn btn-primary" name="register"><i class="fa fa-user-md"></i> Register</button>
@@ -204,17 +183,12 @@ if(isset($_POST['register'])){
                     </form>
                 </div>
             </div>
-
             <div class="col-md-6">
                 <div class="box">
                     <h1>Login</h1>
-
                     <p class="lead">Already our customer?</p>
-
                     <hr>
-
                     <form action="<?php echo $_SERVER["PHP_SELF"]; ?>" method="post">
-
                         <div class="form-group">
                             <label for="username">Username</label>
                             <input type="text" class="form-control" name="login-username">
@@ -229,18 +203,11 @@ if(isset($_POST['register'])){
                     </form>
                 </div>
             </div>
-
-
         </div>
-        <!-- /.container -->
     </div>
     <!-- /#content -->
-
 <?php
-
 require_once('/footer.php');
-
 ?>
 </body>
-
 </html>
