@@ -37,16 +37,15 @@ require_once('/navbar.php');
                                 <tbody>
 
                                     <?php
-                                        $specorderdetails_query="select I. event_id, I.event_date, P.prod_name, P.prod_price
+
+                                        $specific_order = $_GET['specific-order'];
+
+                                        $specorderdetails_query="select C.event_id, C.date, P.prod_name, P.prod_price
                                                                  from inventory I join products P
-                                                                                  on I.prod_code = P.prod_code
-                                                                                  join accounts A 
-                                                                                  on I.account_id = A.account_id
-                                                                                  where I.event_id in (select C.event_id 
-                                                                                                       from cart C
-                                                                                                       where C.receipt_id={$_GET['specific-order']}
-                                                                                                       and C.account_id={$_SESSION['acc_id']})
-                                                                  order by event_id desc";
+                                                                                  on I.prod_id = P.prod_id
+                                                                                  join cart c
+                                                                                  on I.event_id = C.event_id
+                                                                 where C.cart_id = {$specific_order}";
 
                                         $specorderdetails_result=mysqli_query($dbc, $specorderdetails_query);
                                         $specorderdetails_row=mysqli_fetch_array($specorderdetails_result, MYSQLI_ASSOC);
@@ -54,16 +53,16 @@ require_once('/navbar.php');
                                         while($specorderdetails_row){
                                             echo "<tr>";
                                             echo "<td>".$specorderdetails_row['event_id']."</td>";
-                                            echo "<td>".$specorderdetails_row['event_date']."</td>";
+                                            echo "<td>".$specorderdetails_row['date']."</td>";
                                             echo "<td>".$specorderdetails_row['prod_name']."</td>";
                                             echo "<td>".$specorderdetails_row['prod_price']."</td>";
                                             echo "</tr>";
 
-                                            $specorderdetails_row=mysqli_fetch_array($specorderdetails_result, MYSQLI_ASSOC);                                        }
+                                            $specorderdetails_row=mysqli_fetch_array($specorderdetails_result, MYSQLI_ASSOC);
+                                        }
                                     ?>
                                 </tbody>
                             </table>
-                            
                         </div>
                     </div>
                 </div>
