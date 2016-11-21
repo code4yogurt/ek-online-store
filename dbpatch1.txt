@@ -1,3 +1,21 @@
+ALTER TABLE `ek_finaldb`.`complaint` 
+CHANGE COLUMN `complaint_date` `complaint_date` DATE NOT NULL ,
+CHANGE COLUMN `complaint_subject` `complaint_subject` CHAR(20) NOT NULL ,
+CHANGE COLUMN `complaint_status` `complaint_status` INT(1) NOT NULL ,
+CHANGE COLUMN `complaint_content` `complaint_content` VARCHAR(255) NOT NULL ,
+ADD COLUMN `complaint_fname` VARCHAR(45) NOT NULL AFTER `account_id`,
+ADD COLUMN `complaint_lname` VARCHAR(45) NOT NULL AFTER `complaint_fname`,
+ADD COLUMN `complaint_emial` VARCHAR(45) NOT NULL AFTER `complaint_lname`;
+
+CREATE TABLE `ek_finaldb`.`new_table` (
+  `rating_id` INT NOT NULL AUTO_INCREMENT,
+  `rating` INT NOT NULL,
+  `rating_date` DATE NOT NULL,
+  `prod_id` INT NOT NULL,
+  `account_id` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`rating_id`));
+
+
 ALTER TABLE `ek_finaldb`.`product_view` 
 CHANGE COLUMN `prod_code` `prod_id` INT(11) NOT NULL ;
 
