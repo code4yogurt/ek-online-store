@@ -11,6 +11,10 @@ if($user!='aac'){
 echo "Welcome Admin: ";
 echo $_SESSION['username'];
 echo "<br><br>";
+echo "<a href='admin_bank.php'>PENDING ORDERS</a><br>";
+echo "<br><br>";
+echo "<br><br>";
+
 echo "<a href='change_stock.php'>Add/Deduct Stock</a><br>";
 echo "<a href='inventory_change.php'>Inventory Change</a><br>";
 echo "<a href='inventory_report.php'>Current Inventory</a><br>";
@@ -56,12 +60,12 @@ $day_diff=$diff->format("%a");
 echo $day_diff;
   if($day_diff>7){
     $date=$year1 . '-' . $month1 . '-' . $day1;
-        $query3="select prod_code from inventory where event_id in(select event_id from cart where date='{$date}' AND cart_status=1)";
+        $query3="select prod_id from inventory where event_id in(select event_id from cart where date='{$date}' AND cart_status=1)";
         $result3=mysqli_query($dbc,$query3);
          while($row=mysqli_fetch_array($result3,MYSQLI_ASSOC)){
-          $prod_code=$row['prod_code'];
+          $prod_code=$row['prod_id'];
           $datetime= date("Y-m-d H:i:s");
-          $query4="insert into inventory (change_type, quantity, event_date,prod_code,remarks,account_id) values ('in','1','{$datetime}','{$prod_code}','Cart expired','{$account_id}')";
+          $query4="insert into inventory (change_type, quantity, event_date,prod_id,remarks,account_id) values ('in','1','{$datetime}','{$prod_code}','Cart expired','{$account_id}')";
           $result4=mysqli_query($dbc,$query4);
          }
          $query2="delete from cart where date='$date' AND cart_status=1";
