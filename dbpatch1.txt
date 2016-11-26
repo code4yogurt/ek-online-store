@@ -1,3 +1,17 @@
+CREATE TABLE `ek_finaldb`.`size` (
+  `size_id` INT NOT NULL AUTO_INCREMENT,
+  `prod_id` VARCHAR(45) NOT NULL,
+  `size` VARCHAR(3) NOT NULL,
+  PRIMARY KEY (`size_id`));
+
+
+ALTER TABLE `ek_finaldb`.`inventory` 
+CHANGE COLUMN `account_id` `account_id` INT(11) NOT NULL ,
+ADD COLUMN `size_id` VARCHAR(3) NULL AFTER `account_id`;
+
+ALTER TABLE `ek_finaldb`.`new_table` 
+RENAME TO  `ek_finaldb`.`top_rated` ;
+
 ALTER TABLE `ek_finaldb`.`complaint` 
 CHANGE COLUMN `complaint_date` `complaint_date` DATE NOT NULL ,
 CHANGE COLUMN `complaint_subject` `complaint_subject` CHAR(20) NOT NULL ,
