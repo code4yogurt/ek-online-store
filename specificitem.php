@@ -1,8 +1,9 @@
 
 <?php
 session_start();
-
-$item=$_GET['submit'];
+if(!isset($_SESSION['item'])){
+$_SESSION['item']=$_GET['submit'];
+}
 require_once('../mysql_connect.php');
 require_once('navbar.php');
 ?>
@@ -18,7 +19,7 @@ require_once('navbar.php');
 $_SESSION['checkout']=0;
 
 $ip= $_SERVER['REMOTE_ADDR'];
-$query="select status from products where prod_name='$item'";
+$query="select status from products where prod_name='{$_SESSION['item']}'";
 $result=mysqli_query($dbc,$query);
 while($row=mysqli_fetch_array($result,MYSQLI_ASSOC)){
 $status= $row['status'];
@@ -29,7 +30,7 @@ header("Location: http://".$_SERVER['HTTP_HOST'].  dirname($_SERVER['PHP_SELF'])
 
 }
 else{
-$query="select prod_id from products where prod_name='$item'";
+$query="select prod_id from products where prod_name='{$_SESSION['item']}'";
 $result=mysqli_query($dbc,$query);
 while($row=mysqli_fetch_array($result,MYSQLI_ASSOC)){
 $prod_code= $row['prod_id'];
@@ -71,20 +72,25 @@ else{
 	$result=mysqli_query($dbc,$query);
 }
 
-$query="SELECT SUM(quantity) from inventory where prod_id =$prod_code and change_type = 'in'";
+
+//--------------------------------------------------------------------------------------------------------------------
+if(isset($_POST['check_size'])){
+$query="SELECT SUM(quantity) from inventory where size_id ='{$_POST['sizes']}' and change_type = 'in'";
 $result=mysqli_query($dbc,$query);
 while($row=mysqli_fetch_array($result,MYSQLI_ASSOC)){
 $n1=$row['SUM(quantity)'];
 }
-$query="SELECT SUM(quantity) from inventory where prod_id =$prod_code and change_type = 'out'";
+$query="SELECT SUM(quantity) from inventory where size_id ='{$_POST['sizes']}' and change_type = 'out'";
 $result=mysqli_query($dbc,$query);
 while($row=mysqli_fetch_array($result,MYSQLI_ASSOC)){
 $n2=$row['SUM(quantity)'];
 }
 $quantity=$n1-$n2;
 
+}
+//---------------------------------------------------------------------------------------------------------------------
 
-$query="select * from products where prod_name='$item'";
+$query="select * from products where prod_name='{$_SESSION['item']}'";
 $result=mysqli_query($dbc,$query);
 
 while($row=mysqli_fetch_array($result,MYSQLI_ASSOC)){
@@ -104,15 +110,34 @@ while($row=mysqli_fetch_array($result,MYSQLI_ASSOC)){
                         <div class="col-lg-6">
                             <div class="box">
                                 <h1 class="text-center"><?php echo "{$row['prod_name']}";?></h1>
-                                
+                                Size:
+                                <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
+                                <select name='sizes'>
+                                <?php
+                                $query2="select * from size where prod_id='{$prod_code}'";
+                                $result2=mysqli_query($dbc,$query2);
+                                while($row2=mysqli_fetch_array($result2,MYSQLI_ASSOC)){
+                                echo"
+                                <option value='{$row2['size_id']}' selected>{$row2['size']}</option>
+                                ";
+                                }
+                                ?>
+                                <?php
+                                echo"
+                                </select>
+                                <button type='submit' name='check_size' value='$name' class='btn btn-primary'>Check Stock</button>
+                                </form>
+                                ";
+                                ?>
                                 <p class="price">₱<?php echo "{$row['prod_price']}";?></p>
                                 <?php
                                 $name=$row['prod_name'];
                                 if(isset($_SESSION['type'])){
+                                    if(isset($quantity)){
                                 	if($quantity>0){
 								
 									echo "<center><form action='$output' method='POST'>
-									<button type='submit' name='add_item' value='$name' class='btn btn-primary'><i class='fa fa-shopping-cart'></i>ADD TO CART</button>
+									<button type='submit' name='add_item' value='{$_POST['sizes']}' class='btn btn-primary'><i class='fa fa-shopping-cart'></i>ADD TO CART</button>
 									</form></center>
 									";
 
@@ -120,6 +145,7 @@ while($row=mysqli_fetch_array($result,MYSQLI_ASSOC)){
 									else{
 									echo '<br><center>There are currently no stocks available</center>';
 									}	
+                                }
                                 }
                                 else{
                                 	echo '<center>Login first to add to cart</center>';	

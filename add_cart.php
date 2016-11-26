@@ -7,7 +7,7 @@ $result=mysqli_query($dbc,$query);
 while($row=mysqli_fetch_array($result,MYSQLI_ASSOC)){
 $user_id= $row['account_id'];
 }
-$query="select prod_id from products where prod_name='$cart_item'";
+$query="select prod_id from size where size_id='$cart_item'";
 $result=mysqli_query($dbc,$query);
 while($row=mysqli_fetch_array($result,MYSQLI_ASSOC)){
 $prod_code= $row['prod_id'];
@@ -19,12 +19,12 @@ $year1=date('Y');
 	$date=$year1 . '-' . $month1 . '-' . $day1;
 
 
-$query="SELECT SUM(quantity) from inventory where prod_id =$prod_code and change_type = 'in'";
+$query="SELECT SUM(quantity) from inventory where prod_id =$cart_item and change_type = 'in'";
 $result=mysqli_query($dbc,$query);
 while($row=mysqli_fetch_array($result,MYSQLI_ASSOC)){
 $n1=$row['SUM(quantity)'];
 }
-$query="SELECT SUM(quantity) from inventory where prod_id =$prod_code and change_type = 'out'";
+$query="SELECT SUM(quantity) from inventory where prod_id =$cart_item and change_type = 'out'";
 $result=mysqli_query($dbc,$query);
 while($row=mysqli_fetch_array($result,MYSQLI_ASSOC)){
 $n2=$row['SUM(quantity)'];
@@ -33,7 +33,7 @@ $quantity=$n1-$n2;
 if($quantity>0){
 	$datetime= date("Y-m-d H:i:s");
 
-$query="insert into inventory (change_type, quantity, event_date,prod_id,remarks,account_id) values ('out','1','{$datetime}','{$prod_code}','Added to cart','{$user_id}')";
+$query="insert into inventory (change_type, quantity, event_date,prod_id,size_id,remarks,account_id) values ('out','1','{$datetime}','{$prod_code}','{$cart_item}','Added to cart','{$user_id}')";
 $result=mysqli_query($dbc,$query);
 $query="select event_id from inventory where event_date='{$datetime}' AND account_id='{$user_id}'";
 $result=mysqli_query($dbc,$query);

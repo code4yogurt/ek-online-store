@@ -1,7 +1,7 @@
 
 <?php
 session_start();
-require_once('../db_connect.php');
+require_once('../mysql_connect.php');
 if (isset($_SESSION['type'])) {
       $username=$_SESSION['username'];  
   
@@ -58,6 +58,7 @@ $user_id= $row['account_id'];
                                         <tr>
                                             <th> </th>
                                             <th>PRODUCT</th>
+                                            <th>SIZE</th>
                                             <th>QUANTITY</th>
                                             <th>UNIT PRICE</th>
                                             <th colspan="2">SUBTOTAL</th>
@@ -66,7 +67,7 @@ $user_id= $row['account_id'];
                                     <tbody>
                                       <?php
                                       $total=0;
-                                      $query="SELECT p.image, p.prod_name,sum(I.quantity),SUM(P.prod_price),p.prod_price FROM inventory I JOIN products P on I.prod_id=P.prod_id WHERE I.event_id in (select event_id from cart where account_id ='{$user_id}' AND cart_status=1)  group by I.prod_id,I.quantity";
+                                      $query="SELECT i.size_id,s.size,p.image, p.prod_name,sum(I.quantity),SUM(P.prod_price),p.prod_price FROM inventory I JOIN products P on I.prod_id=P.prod_id JOIN size s on i.size_id=s.size_id WHERE I.event_id in (select event_id from cart where account_id ='{$user_id}' AND cart_status=1) group by I.size_id,I.quantity";
                                       $result=mysqli_query($dbc,$query);
                                       while($row=mysqli_fetch_array($result,MYSQLI_ASSOC)){
                                       ?>
@@ -78,6 +79,8 @@ $user_id= $row['account_id'];
                                                 </a>
                                             </td>
                                             <td><a href="#"><?php echo"{$row['prod_name']}";?></a>
+                                            </td>
+                                            <td><?php echo"{$row['size']}";?>
                                             </td>
                                             <td align="center">
                                                 <?php echo"{$row['sum(I.quantity)']}";?>
@@ -91,7 +94,7 @@ $user_id= $row['account_id'];
 
 
                                               <form action='remove_cart.php' method='POST'>
-                                              <button type='submit' name='remove' value=<?php echo"'{$row['prod_name']}'";?> class='btn btn-primary'><i class="fa fa-trash-o"></i></button>
+                                              <button type='submit' name='remove' value=<?php echo"'{$row['size_id']}'";?> class='btn btn-primary'><i class="fa fa-trash-o"></i></button>
                                               </form>
                                               </td>
                                               <?php 
@@ -128,10 +131,7 @@ $user_id= $row['account_id'];
                                          </tr>
 
                                           <th colspan="4">Discount</th>
-                                          <th>₱ <?php echo"{$total}";?></th>
                                         </tr>
-
-
                                           <tr>
                                            <th colspan="6"></th>
                                          </tr>
@@ -193,34 +193,53 @@ $user_id= $row['account_id'];
                           if (isset($_POST['couponButton'])){
                             if(empty($_POST['checkCoupon'])){
                               $couponCode=FALSE;
-                              $valid=0;
+                              $_SESSION['valid']=0;
                               $message="Please try again!";
                               echo "<p align = 'center'> <font color ='red'>" . $message. "</font> </p>";
                               }else{
                               $couponCode=$_POST['checkCoupon'];
 
-                              $query="SELECT * FROM coupon  WHERE coupon_code='{$couponCode}' and (account_id='{$_SESSION['acc_id']}' or account_id='NULL') and coupon_status='1' ";
+                              $query="SELECT * FROM coupon  WHERE coupon_code='{$couponCode}' and (account_id='{$user_id}' or account_id='NULL') and coupon_status='1' ";
                               $result=mysqli_query($dbc,$query); 
                               if (!mysqli_num_rows($result)==0) {
                               while($row=mysqli_fetch_array($result,MYSQLI_ASSOC)){
-                                
+                                $coupon_id1=$row['coupon_id'];
+                                echo $coupon_id1;
+                                if($row['coupon_type']=='checkout'){
                                  echo "<p align='center'> <font color='green'>  Coupon is Valid! </font> </p>";
-                                 $valid=1;
-
+                                 $_SESSION['valid']=1;
+                                }
+                                else{
+                                  $query2="select coupon_id from coupon where prod_id in(select prod_id from inventory where event_id in(select event_id from cart where account_id='{$user_id}' and cart_status=1))";
+                                  $result2=mysqli_query($dbc,$query2); 
+                                  while($row2=mysqli_fetch_array($result,MYSQLI_ASSOC)){
+                                     echo "coupon id : ".$row2['coupon_id'];
+                                    if($coupon_id1==$row2['coupon_id']){
+                                      echo "<p align='center'> <font color='green'>  Coupon is Valid! </font> </p>";
+                                      $_SESSION['valid']=1;
+                                    }
+                                    else{
+                                     echo "<p align='center'> <font color='red'>  Coupon is not valid! </font> </p>";
+                                      $_SESSION['valid']=0; 
+                                    }
+                                   
+                                  }
+                                }
 
                                   }
-                                  }else{
-                                    $valid=0;
+                                  
+                                  }
+
+                                  
+                                  else{
+                                    $_SESSION['valid']=0;
 
                                   echo "<p align='center'> <font color='red'>  Coupon is Invalid! </font> </p>";
                                   }
+
+
+
                                 }
-                              }
-
-                              if (isset($_POST['useCoupon'])){
-
-                                echo "<p align='center'> <font color='green'>"  .$_POST['checkCoupon']. " USED! </font> </p>";
-
                               }
 
                               if(isset($_POST['useCoupon'])){
@@ -275,8 +294,9 @@ $user_id= $row['account_id'];
                             <br>
                             
                             <?php
+                            echo $_SESSION['valid'];
                             if(isset($_POST['couponButton'])){
-                              if($valid==1){
+                              if($_SESSION['valid']==1){
 
 
                                 ?>
