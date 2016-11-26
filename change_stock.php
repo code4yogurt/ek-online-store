@@ -26,7 +26,7 @@ if(isset($_POST['product_change'])){
 <!--GETTING NUMBER OF PAGES AND SETTING OF START OF ITEMS PER PAGE-->
 <?php
 
-$query="SELECT count(prod_code) as prod_count FROM products";
+$query="SELECT count(prod_id) as prod_count FROM products";
 $result=mysqli_query($dbc,$query);
 $row=mysqli_fetch_array($result, MYSQLI_ASSOC);
 $pages=$row['prod_count'] / 10;
@@ -48,7 +48,10 @@ echo"
 <table width='75%' border='1' align='center' cellpadding='0' cellspacing='0' bordercolor='#000000'>
 <tr>
 <td>
-PRODUCTS
+PRODUCT
+</td>
+<td>
+SIZE
 </td>
 <td>
 QUANTITY
@@ -57,25 +60,28 @@ QUANTITY
 ";
 
 
-$query="select prod_code, prod_name from products where status=1 LIMIT $start,10";
+$query="select prod_name,s.size,s.size_id from products p JOIN size s on p.prod_id=s.prod_id where p.status=1 LIMIT $start,10";
 $result=mysqli_query($dbc,$query);
 while($row=mysqli_fetch_array($result,MYSQLI_ASSOC)){
 echo"
 <tr>
 <td>
 <form action='{$_SERVER['PHP_SELF']}' method='POST'>
-<input type='radio' name='product' value='{$row['prod_name']}'> {$row['prod_name']}
+<input type='radio' name='product' value='{$row['size_id']}'> {$row['prod_name']}
+</td>
+<td>
+{$row['size']}
 </td>
 <td>
 ";
 
 
-$query2="SELECT SUM(quantity) from inventory where prod_code ={$row['prod_code']} and change_type = 'in'";
+$query2="SELECT SUM(quantity) from inventory where size_id ={$row['size_id']} and change_type = 'in'";
 $result2=mysqli_query($dbc,$query2);
 $row2=mysqli_fetch_array($result2,MYSQLI_ASSOC);
 $n1=$row2['SUM(quantity)'];
 
-$query3="SELECT SUM(quantity) from inventory where prod_code ={$row['prod_code']} and change_type = 'out'";
+$query3="SELECT SUM(quantity) from inventory where size_id ={$row['size_id']} and change_type = 'out'";
 $result3=mysqli_query($dbc,$query3);
 $row3=mysqli_fetch_array($result3,MYSQLI_ASSOC);
 $n2=$row3['SUM(quantity)'];

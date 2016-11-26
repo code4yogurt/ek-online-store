@@ -12,10 +12,11 @@ echo $_SESSION['product'];
 <!-- GET VARIABLES STAGE-->
 <?php
 
-$query="SELECT prod_code FROM products WHERE prod_name='{$_SESSION['product']}'";
+$query="SELECT size_id,prod_id FROM size WHERE size_id='{$_SESSION['product']}'";
 $result=mysqli_query($dbc,$query);
 $row=mysqli_fetch_array($result, MYSQLI_ASSOC);
-$item_code=$row['prod_code'];
+$item_code=$row['size_id'];
+$prod_id = $row['prod_id'];
 $query="SELECT account_id FROM accounts WHERE username='{$_SESSION['username']}'";
 $result=mysqli_query($dbc,$query);
 $row=mysqli_fetch_array($result, MYSQLI_ASSOC);
@@ -30,12 +31,12 @@ $datetime= date("Y-m-d H:i:s");
 
 if(isset($_POST['change'])){
 
-	$query="SELECT SUM(quantity) from inventory where prod_code =$item_code and change_type = 'in'";
+	$query="SELECT SUM(quantity) from inventory where size_id =$item_code and change_type = 'in'";
 	$result=mysqli_query($dbc,$query);
 	$row=mysqli_fetch_array($result,MYSQLI_ASSOC);
 	$n1=$row['SUM(quantity)'];
 
-	$query2="SELECT SUM(quantity) from inventory where prod_code =$item_code and change_type = 'out'";
+	$query2="SELECT SUM(quantity) from inventory where size_id =$item_code and change_type = 'out'";
 	$result2=mysqli_query($dbc,$query2);
 	$row2=mysqli_fetch_array($result2,MYSQLI_ASSOC);
 	$n2=$row2['SUM(quantity)'];
@@ -50,7 +51,7 @@ else
 {
 	if($_POST['dropdown']=='1')
 	{
-		$query="insert into inventory (change_type, quantity, event_date,prod_code,remarks,account_id) values ('in','{$_POST['quantity']}','{$datetime}','{$item_code}','Admin added stock','{$admin_id}')";
+		$query="insert into inventory (change_type, quantity, event_date,prod_id,size_id,remarks,account_id) values ('in','{$_POST['quantity']}','{$datetime}','{$prod_id}','{$item_code}','Admin added stock','{$admin_id}')";
 		$result=mysqli_query($dbc,$query);
 		echo"<br><font color = 'red'>Successfully added {$_POST['quantity']} stock/s of {$_SESSION['product']}</font>";
 	}
@@ -60,7 +61,7 @@ else
 			echo"<br><font color='red'>Deducting this much will result to a negative stock amount</font>";
 		}
 		else{
-			$query="insert into inventory (change_type, quantity, event_date,prod_code,remarks,account_id) values ('out','{$_POST['quantity']}','{$datetime}','{$item_code}','Admin reduced stock','{$admin_id}')";
+			$query="insert into inventory (change_type, quantity, event_date,prod_id,size_id,remarks,account_id) values ('out','{$_POST['quantity']}','{$datetime}','{$prod_id}','{$item_code}','Admin reduced stock','{$admin_id}')";
 			$result=mysqli_query($dbc,$query);
 			echo"<br><font color = 'red'>Successfully deducted {$_POST['quantity']} stock/s of {$_SESSION['product']}</font>";	
 		}
