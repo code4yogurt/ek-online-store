@@ -1,13 +1,31 @@
 ALTER TABLE `ek_finaldb`.`questionnaire` 
-DROP COLUMN `question_ans`,
-CHANGE COLUMN `question_no` `question_no` INT(11) NOT NULL AUTO_INCREMENT FIRST;
+AUTO_INCREMENT = 1 ,
+DROP COLUMN `question_no`,
+CHANGE COLUMN `questionnaire_id` `questionnaire_id` INT(11) NOT NULL AUTO_INCREMENT ,
+DROP PRIMARY KEY,
+ADD PRIMARY KEY (`questionnaire_id`);
 
-CREATE TABLE `ek_finaldb`.`questionnaire_ans` (
-  `answer_id` INT NOT NULL AUTO_INCREMENT,
-  `answer` VARCHAR(255) NOT NULL,
-  `questionnaire_id` INT NOT NULL,
-  `question_id` INT NOT NULL,
-  `account_id` INT NOT NULL,
-  PRIMARY KEY (`answer_id`))
+CREATE TABLE `ek_finaldb`.`question` (
+ `question_id` INT NOT NULL AUTO_INCREMENT,
+ `questionnaire_id` VARCHAR(45) NOT NULL,
+ `question_name` VARCHAR(45) NOT NULL,
+ PRIMARY KEY (`question_id`))
 ENGINE = InnoDB
 AUTO_INCREMENT = 1;
+
+ALTER TABLE `ek_finaldb`.`question` 
+CHANGE COLUMN `questionnaire_id` `questionnaire_id` INT NOT NULL ,
+CHANGE COLUMN `question_name` `question_name` VARCHAR(255) NOT NULL;
+
+CREATE TABLE `ek_finaldb`.`answers` (
+ `answer_id` INT NOT NULL,
+ `question_id` INT NOT NULL,
+ PRIMARY KEY (`answer_id`));
+
+ALTER TABLE `ek_finaldb`.`answers` 
+ADD COLUMN `answer_name` VARCHAR(255) NOT NULL AFTER `question_id`;
+
+ALTER TABLE `ek_finaldb`.`questionnaire_ans` 
+DROP COLUMN `questionnaire_id`,
+CHANGE COLUMN `answer_id` `input_id` INT(11) NOT NULL AUTO_INCREMENT ,
+CHANGE COLUMN `answer` `answer_id` INT(11) NOT NULL;
