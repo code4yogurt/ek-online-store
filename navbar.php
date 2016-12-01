@@ -47,6 +47,7 @@
                             echo "<li><a href='signup.php'>Register</a></li>";
                         }
                         else{
+                            echo "<li><p style='color:#ffffff !important;'>Welcome, <a href='editaccount.php'>{$_SESSION['username']}</a></p></li>";
                             echo "<li><a href='logout.php'>Logout</a></li>";
                             echo "<li><a href='orderstatus.php'>Check Order</a></li>";
                         }
