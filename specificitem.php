@@ -85,7 +85,7 @@ while($row=mysqli_fetch_array($result,MYSQLI_ASSOC)){
                 <div class="row" id="productMain">
                     <div class="col-lg-6">
                         <div id="mainImage">
-                            <img src="<?php echo "{$row['image']}";?>" alt="" class="img-responsive">
+                            <img src="../admin/production/uploads/<?php echo "{$row['image']}";?>" alt="" class="img-responsive">
                         </div>
                     </div>
                     
@@ -107,7 +107,6 @@ while($row=mysqli_fetch_array($result,MYSQLI_ASSOC)){
                                         <?php
                                         echo"
                                             </select>
-
                                             <button type='submit' name='check_size' value='$name' class='btn btn-primary'>Check Stock</button>
                                             </form>
                                         ";
@@ -166,17 +165,9 @@ while($row=mysqli_fetch_array($result,MYSQLI_ASSOC)){
                                         </div>
                                     </div>
                                     </p>
-                </div>
-                        </div>
+                            </div>
 
-                <!-- /.col-md-9 -->
-                    
-            
-
-
-                    <div class="box" id="details">
-            <h4>Write a Comment:</h4><br> 
-<?php
+                            <?php
                 $id=$row['prod_id'];
                 }
                 $query="select username from accounts where account_id in (select account_id from cart where cart_activity>1 and event_id in (select event_id from inventory where prod_id=$prod_code))";
@@ -197,16 +188,30 @@ while($row=mysqli_fetch_array($result,MYSQLI_ASSOC)){
 
 
 
-                
-                <textarea rows='5' cols='50' name='content'></textarea>
-                
-                <input type='submit' name='comment' value='Submit' class='btn btn-primary'>
+                    <div class="row">
+                        <div class="col-md-12">
+                               <h4>Write a Comment:</h4><br> 
+                            <textarea rows='5' cols='50' name='content'></textarea>
+                             <div class="row">
+                        <div class="col-md-12">
+                            <input type='submit' name='comment' value='Submit' class='btn btn-primary'>
+                             </div>
+                    </div>
+                         </div>
+                    </div>
                 </form>
                  
-                 
+                        </div>
+
+                <!-- /.col-md-9 -->
+                    
+            
+       
+
+                    <div class="row">
+                        <div class="col-md-12">
                 <?php
                 }
-
                 echo"
                 <div class='table-responsive'>
                   <table class='table'> 
@@ -226,15 +231,18 @@ while($row=mysqli_fetch_array($result,MYSQLI_ASSOC)){
                 }
                 echo"</table>";
                 }
-
                 ?>
+
+            </div>
+        </div>
 
 
             <!-- /.container -->
             
 
-</div>
+
                  </div>
+             
 
             <div class="box" id="details">
             <h4>Suggested Items:</h4><br> 
@@ -245,7 +253,6 @@ while($row=mysqli_fetch_array($result,MYSQLI_ASSOC)){
             while($row=mysqli_fetch_array($result,MYSQLI_ASSOC)){
                 $category=$row['category'];
             }
-
             echo"<table><tr>";
             $query="select *, count(pv.prod_id),p.prod_name from products p join product_view pv on p.prod_id=pv.prod_id where category = '{$category}' and pv.prod_id != '{$_SESSION['prod_code']}' and p.status=1 group by prod_name order by count(pv.prod_id) asc LIMIT 4";
             $result=mysqli_query($dbc,$query);
@@ -260,10 +267,9 @@ while($row=mysqli_fetch_array($result,MYSQLI_ASSOC)){
                                     </td>
             ";
             }
-
-
                 ?>
             </table>
+            </div>
             </div>
 
         <!-- /#content -->
@@ -275,4 +281,3 @@ require_once('footer.php');
 </body>
 
 </html>
-
