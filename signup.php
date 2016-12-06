@@ -1,18 +1,13 @@
 <?php
-
 session_start();
-require_once('/connect.php');
-
+require_once('../db_connect.php');
 if(isset($_SESSION['badlogin'])){
     if($_SESSION['badlogin']>=999){
         header("Location: http://".$_SERVER['HTTP_HOST'].dirname($_SERVER['PHP_SELF'])."/blocked.php");
     }
 }
-
     //PHP FORM FOR LOGIN FORM
-
 if(isset($_POST['login'])){ 
-
         //checks if username field is empty
     if(empty($_POST['login-username'])){
         $un=FALSE;
@@ -29,7 +24,6 @@ if(isset($_POST['login'])){
     else{
         $pw=$_POST['login-password'];
     }
-
         //makes sure username and password have values before error check
     if($un && $pw){
         $salt=sha1(md5($pw));
@@ -37,14 +31,11 @@ if(isset($_POST['login'])){
         $query="select account_id, username, type from accounts where username='$un' and password='$pwchk'";
         $result=@mysqli_query($dbc, $query);
         $row=mysqli_fetch_array($result, MYSQLI_ASSOC);
-
         if($row){
             $_SESSION['username']=$row['username'];
             $_SESSION['type']=$row['type'];
-
             $_SESSION['is_loggedin']=1;
             $_SESSION['acc_id']=$row['account_id'];
-
             if($row['type']=='uac'){
                 header("Location: http://".$_SERVER['HTTP_HOST'].  dirname($_SERVER['PHP_SELF'])."/index.php");
             }
@@ -64,16 +55,12 @@ if(isset($_POST['login'])){
         echo "<font color='red'> Please try again! </font>";
     }
 }
-
     //PHP CODE FOR REGISTRATION FORM
-
 if(isset($_POST['register'])){
-
     //EMAIL
     if(isset($_POST['reg-email'])){
         $em=$_POST['reg-email'];
     }
-
     //USERNAME
     if(isset($_POST['reg-username'])){
         $un=$_POST['reg-username'];
@@ -83,7 +70,6 @@ if(isset($_POST['register'])){
     if(isset($_POST['reg-pass'])){
         $pw=$_POST['reg-pass'];
     }
-
     //PW VERIFICATION
     if(isset($_POST['pwverify'])){
         $pwv=$_POST['pwverify'];
@@ -98,37 +84,45 @@ if(isset($_POST['register'])){
     if(isset($_POST['reg-contactno'])){
         $cn=$_POST['reg-contactno'];
     }
+    //FIRST NAME
+    if(isset($_POST['reg-fn'])){
+        $fn=$_POST['reg-fn'];
+    }
+    //LAST NAME
+    if(isset($_POST['reg-ln'])){
+        $ln=$_POST['reg-ln'];
+    }
+    //GENDER
+    if(isset($_POST['reg-g'])){
+        $g=$_POST['reg-g'];
+    }
+    //ADDRESS
+    if(isset($_POST['reg-ad'])){
+        $ad=$_POST['reg-ad'];
+    }
     
     /* VALUES - em:E-MAIL; un:USERNAME; pw:PASSWORD; pwv:PASSWORD VERIFICATION; gd:GENDER;
     Makes sure all the fields have are not empty */
-    if($em && $un && $pw && $pwv && $cn && $bd){
-
+    if($em && $un && $pw && $pwv && $cn && $bd && $fn && $ln && $g && $ad){
     //checks if password matches the password verification
         if($pw!=$pwv){
             $pwerror_msg="Passwords do not match!";
         }
         else{
-
             $salt = sha1(md5($pw));
             $encpw = md5($pw).$salt;
-
-            $signup_query = "insert into accounts (email, username, password, birthdate, contact_number, type)
-            values ('{$em}', '{$un}', '{$encpw}', '{$bd}', '{$cn}', 'uac')";
-
+            $signup_query = "insert into accounts (email, username, password, birthdate, contact_number, type, first_name, last_name, address, gender)
+            values ('{$em}', '{$un}', '{$encpw}', '{$bd}', '{$cn}', 'uac','{$fn}','{$ln}','{$ad}','{$g}')";
             $signup_result=@mysqli_query($dbc,$signup_query);
-
             $_SESSION['signup-msg']="New account has been added!";
             $_SESSION['signup-flag']=1;
             $_SESSION['is_loggedin']=1;
-
             $login_query = "select * from accounts where username='$un' and password='$encpw'";
             $login_result=mysqli_query($dbc,$login_query);
             $login_row=mysqli_fetch_array($login_result, MYSQLI_ASSOC);
-
             $_SESSION['username']=$login_row['username'];
             $_SESSION['type']=$login_row['type'];
             $_SESSION['acc_id'] = $login_row['account_id'];
-
             header("Location: http://".$_SERVER['HTTP_HOST'].  dirname($_SERVER['PHP_SELF'])."/index.php");
         }
     }
@@ -136,7 +130,6 @@ if(isset($_POST['register'])){
         echo "<font color=r'red'> Please try again! </font>";
     }
 }   
-
     require_once('/navbar.php');
 ?>
 
@@ -187,7 +180,26 @@ if(isset($_POST['register'])){
                         <div class="form-group">
                             <label for="contactno">Contact Number</label><br>
                             <input type="text" class="form-control" name="reg-contactno" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="firstname">First Name</label><br>
+                            <input type="text" class="form-control" name="reg-fn" required>
                         </div> 
+                        <div class="form-group">
+                            <label for="lastname">Last Name</label><br>
+                            <input type="text" class="form-control" name="reg-ln" required>
+                        </div> 
+                        <div class="form-group">
+                            <label for="gender">Gender</label><br>
+                            <select name="reg-g" class="form-control"  required>
+                                <option value='M' selected>Male</option>
+                                <option value='F' selected>Female</option>
+                            </select>
+                        </div> 
+                        <div class="form-group">
+                            <label for="address">Address</label><br>
+                            <input type="text" class="form-control" name="reg-ad" required>
+                        </div>  
                         <div class="text-center">
                             <button type="submit" class="btn btn-primary" name="register"><i class="fa fa-user-md"></i> Register</button>
                         </div>
