@@ -69,6 +69,7 @@ while($row=mysqli_fetch_array($result,MYSQLI_ASSOC)){
 $n2=$row['SUM(quantity)'];
 }
 $quantity=$n1-$n2;
+$_SESSION['current_quantity']=$quantity;
 }
 //---------------------------------------------------------------------------------------------------------------------
 $query="select * from products where prod_name='{$_SESSION['item']}'";
@@ -92,7 +93,9 @@ while($row=mysqli_fetch_array($result,MYSQLI_ASSOC)){
                     <div class="col-lg-6">
                         <div class="box">
                             <h1 class="text-center"><?php echo "{$row['prod_name']}";?></h1>
+                                <p align="right"><a href='size_chart.php'>Size Chart</a></p> 
                                 Size:
+
                                     <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
                                         <select name='sizes'>
                                             <?php
@@ -103,13 +106,19 @@ while($row=mysqli_fetch_array($result,MYSQLI_ASSOC)){
                                                         <option value='{$row2['size_id']}' selected>{$row2['size']}</option>
                                                     ";
                                             }
+
                                             ?>
+
                                         <?php
                                         echo"
                                             </select>
                                             <button type='submit' name='check_size' value='$name' class='btn btn-primary'>Check Stock</button>
                                             </form>
                                         ";
+                                        if(isset($_POST['check_size'])){
+                                            echo "Stock: ";
+                                            echo $_SESSION['current_quantity'];
+                                        }
                                         ?>
 
                                         <p class="price">₱<?php echo "{$row['prod_price']}";?></p>
