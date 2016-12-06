@@ -4,7 +4,7 @@
 session_start();
 require_once('../db_connect.php');
 
-if ($_SESSION['type']!='aac') 
+if ($_SESSION['type']!='aac' && $_SESSION['type']!='sac') 
        header("Location: http://".$_SERVER['HTTP_HOST'].  dirname($_SERVER['PHP_SELF'])."/loginpage.php");
 ?>
   <body class="nav-md">
@@ -22,7 +22,7 @@ if ($_SESSION['type']!='aac')
             <!-- menu profile quick info -->
             <div class="profile">
               <div class="profile_pic">
-                <img src="images/IMG_3042.jpg" alt="..." class="img-circle profile_img">
+                <img src="images/ek_icon.png" alt="..." class="img-circle profile_img">
               </div>
               <div class="profile_info">
                 <span>Welcome,</span>
@@ -37,62 +37,100 @@ if ($_SESSION['type']!='aac')
             <!-- sidebar menu -->
             <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
               <div class="menu_section">
+
                 <h3>General</h3>
+
                 <ul class="nav side-menu">
                   <li><a><i class="fa fa-dashboard"></i> DashBoard <span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
-                      <li><a href="index.html">OverView</a></li>
+                      <li><a href="index.php">Overview</a></li>
                     </ul>
                   </li>
+
                   <li><a><i class="fa fa-users"></i> Users <span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
-                      <li><a href="userList.php">List</a></li>
-                      <li><a href="form.html">Orders</a></li>
+                      <li><a href="userlist.php">List</a></li>
+                      <li><a href="activateUser.php">Activate</a></li>
                       <li><a href="deactivateUser.php">Deactivate</a></li>
                     </ul>
                   </li>
+
                   <li><a><i class="fa fa-shopping-cart"></i> Orders <span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
-                      <li><a href="userList.php">...</a></li>
-                      <li><a href="form.html">....</a></li>
+                      <li><a href="orderlist.php">List</a></li>
                     </ul>
                   </li>
+
                   <li><a><i class="fa fa-tags"></i> Products <span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
-                      <li><a href="products.php">View All</a></li>
-                      <li><a href="media_gallery.html">Edit</a></li>
-                      <li><a href="media_gallery.html">Coupons</a></li>
-                      <li><a href="media_gallery.html">Add New</a></li>
-                      <li><a href="media_gallery.html">Activate</a></li>
+                      <li><a href="products.php">List</a></li>
+                      <li><a href="addProduct_final.php">Add Product</a></li>
+                      <li><a href="selectProduct_final.php">Edit Product</a></li>
+                      <li><a href="activateProducts.php">Activate</a></li>
                       <li><a href="deactivateProduct.php">Deactivate</a></li>
-                      <li><a href="media_gallery.html">Featured</a></li>
-                      <li><a href="media_gallery.html">Coupons</a></li>
-                      <li><a href="media_gallery.html">Reviews/Comments</a></li>
+                      <li><a href="featured_items_final.php">Manage Featured</a></li>
                     </ul>
                   </li>
+
+                  <li><a><i class="fa fa-money"></i> Coupons <span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
+                      <li><a href="viewCoupons.php">List</a></li>
+                      <li><a href="selectCoupon.php">Create Coupon</a></li>
+                    </ul>
+                  </li>
+
+                  <li><a><i class="fa fa-comments-o"></i> Comments <span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
+                      <li><a href="view_comments_final.php">List</a></li>
+                      <li><a href="manage_comments_final.php">Manage Comments</a></li>
+                    </ul> 
+                  </li>
+
                   <li><a><i class="fa fa-bar-chart"></i> Reports <span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
-                      <li><a href="tables.html">General</a></li>
-                      <li><a href="tables_dynamic.html">Date Range</a></li>
+                      <li><a href="total_sales_report_final.php">Sales History</a></li>
+                      <li><a href="sales_report_final.php">Sales Reports</a></li>
+                        <li><a href="views_report_final.php">Product & User Views</a></li>
+                        <li><a>Date Range<span class="fa fa-chevron-down"></span></a>
+                          <ul class="nav child_menu">
+                            <li class="sub_menu"><a href="dateRange_selectProduct.php">Products</a>
+                            </li>
+                            <li><a href="dateRange_selectTotalSales.php">Total Sales</a>
+                            </li>
+                            <li><a href="dateRange_selectInventory.php">Inventory</a>
+                            </li>
+                            <li><a href="dateRange_selectViews.php">Views</a>
+                            </li>
+                          </ul>
+                        </li>
                     </ul>
                   </li>
+
                   <li><a><i class="fa fa-truck"></i>Inventory<span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
-                      <li><a href="chartjs.html">Inbound</a></li>
-                      <li><a href="chartjs2.html">Outbound</a></li>
-                      <li><a href="chartjs2.html">Add/Deduct Stock</a></li>
+                      <li><a href="inventory_change_final.php">Inventory Change History</a></li>
+                      <li><a href="inventory_report_final.php">Inventory Reports</a></li>
+                      <li><a href="change_stock.php">Manage Stock</a></li>
                     </ul>
                   </li>
+
+                   <li><a><i class="fa fa-envelope"></i> Questionnaire <span class="fa fa-chevron-down"></span></a>
+                    <ul class="nav child_menu">
+                      <li><a href="createquestionnaire.php">Manage Questionnaires</a></li>
+                      <li><a href="....html">View Responses</a></li>
+                    </ul>
+                  </li>
+                
+
                   <li><a><i class="fa fa-bullhorn"></i> Announcements <span class="fa fa-chevron-down"></span></a>
                     <ul class="nav child_menu">
                       <li><a href="email.php">Email Blast</a></li>
-                      <li><a href="fixed_footer.html">NewsLetters</a></li>
+                     
                     </ul>
                   </li>
                 </ul>
-              </div>
-              
 
+              </div>
             </div>
            
 
@@ -118,7 +156,7 @@ if ($_SESSION['type']!='aac')
                
                 <li class="">
                   <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                    <img src="images/IMG_3042.jpg" alt=""> <?php echo $_SESSION['username']?>
+                    <img src="images/ek_icon.png" alt=""> <?php echo $_SESSION['username']?>
                     <span class=" fa fa-angle-down"></span>
                   </a>
                   <ul class="dropdown-menu dropdown-usermenu pull-right">
@@ -138,12 +176,12 @@ if ($_SESSION['type']!='aac')
                 <li role="presentation" class="dropdown">
                   <a href="javascript:;" class="dropdown-toggle info-number" data-toggle="dropdown" aria-expanded="false">
                     <i class="fa fa-envelope-o"></i>
-                    <span class="badge bg-green">6</span>
+                    <span class="badge bg-green"></span>
                   </a>
                   <ul id="menu1" class="dropdown-menu list-unstyled msg_list" role="menu">
                     <li>
                       <a>
-                        <span class="image"><img src="images/IMG_3042.jpg" alt="Profile Image" /></span>
+                        <span class="image"><img src="images/ek_icon.png" alt="Profile Image" /></span>
                         <span>
                           <span>Joshua Macuja</span>
                           <span class="time">3 mins ago</span>
@@ -155,7 +193,7 @@ if ($_SESSION['type']!='aac')
                     </li>
                     <li>
                       <a>
-                        <span class="image"><img src="images/IMG_3042.jpg" alt="Profile Image" /></span>
+                        <span class="image"><img src="images/ek_icon.png" alt="Profile Image" /></span>
                         <span>
                           <span>Joshua Macuja</span>
                           <span class="time">3 mins ago</span>
@@ -167,7 +205,7 @@ if ($_SESSION['type']!='aac')
                     </li>
                     <li>
                       <a>
-                        <span class="image"><img src="images/IMG_3042.jpg" alt="Profile Image" /></span>
+                        <span class="image"><img src="images/ek_icon.png" alt="Profile Image" /></span>
                         <span>
                           <span>Joshua Macuja</span>
                           <span class="time">3 mins ago</span>
@@ -179,7 +217,7 @@ if ($_SESSION['type']!='aac')
                     </li>
                     <li>
                       <a>
-                        <span class="image"><img src="images/IMG_3042.jpg" alt="Profile Image" /></span>
+                        <span class="image"><img src="images/ek_icon.png" alt="Profile Image" /></span>
                         <span>
                           <span>Joshua Macuja</span>
                           <span class="time">3 mins ago</span>
