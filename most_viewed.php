@@ -2,7 +2,7 @@
 <?php
 
 session_start();
-require_once('../mysql_connect.php');
+require_once('../db_connect.php');
 require_once('navbar.php');
 ?>
  <div id="all">
@@ -16,7 +16,7 @@ require_once('/filter.php')
 ?>
 <div class="col-md-9">
                     <div class="box">
-                        <p><a href = "index.php">Featured</a> | <a href = "top_rated.php">Top Rated</a></p>
+                        <p><a href = "index.php">Featured</a> | <a href = "top_rated.php">Top Rated</a> | <a href = "best_selling.php">Best Selling</a></p>
                         <h1>Most Viewed Items</h1>
                         <p>Items are customers are looking at the most!</p>
                     </div>
@@ -54,13 +54,28 @@ require_once('/filter.php')
                     <div class="row products">
 <?php
 
+$query="select count(distinct p.prod_id) as count from product_view pv join products p on pv.prod_id=p.prod_id";
+                                                    $result=mysqli_query($dbc,$query);
+                                                    $row=mysqli_fetch_array($result, MYSQLI_ASSOC);
+                                                    $pages=$row['count'] / 10;
+                                                    $page_no=ceil($pages);
+                                                    $start=0;
+                                                    if(isset($_GET['go'])){
+                                                      $pn=$_GET['dropdown'];
+                                                    $start=($_GET['dropdown']-1)*10;
+                                                    }
+                                                    else{
+                                                    $pn=1;
+                                                    }
+
+                                                                          echo "<h4 align='right'>Page: {$pn}  </h4>";
 
 $_SESSION['checkout']=0;
 
 
 
 
-$query="select  p.* from product_view pv join products p on pv.prod_id=p.prod_id group by pv.prod_id order by count(pv.prod_id) desc";
+$query="select  p.* from product_view pv join products p on pv.prod_id=p.prod_id group by pv.prod_id order by count(pv.prod_id) desc LIMIT $start,10";
 $result=mysqli_query($dbc,$query);
 
 
@@ -106,31 +121,25 @@ if(isset($_GET['submit'])){
  header("Location: http://".$_SERVER['HTTP_HOST'].  dirname($_SERVER['PHP_SELF'])."/specificitem.php");
 
 }
+
+echo"
+                                                                          <form action='{$_SERVER['PHP_SELF']}' method='GET'>
+                                                                          <p align='right'>Page: <select name='dropdown'></p>
+                                                                          ";
+                                                                          for($i=$page_no;$i>0;$i--){
+                                                                            echo"
+                                                                              <option value='{$i}' selected>{$i} </option>
+                                                                            ";
+                                                                          }
+                                                                          echo"
+                                                                          </select>
+                                                                          <input type='submit' name='go' value='Go' />
+                                                                          </form>
+                                                                          ";
+
 ?>
 
-<div class="pages">
 
-                        <p class="loadMore">
-                            <a href="#" class="btn btn-primary btn-lg"><i class="fa fa-chevron-down"></i> Load more</a>
-                        </p>
-
-                        <ul class="pagination">
-                            <li><a href="#">&laquo;</a>
-                            </li>
-                            <li class="active"><a href="#">1</a>
-                            </li>
-                            <li><a href="#">2</a>
-                            </li>
-                            <li><a href="#">3</a>
-                            </li>
-                            <li><a href="#">4</a>
-                            </li>
-                            <li><a href="#">5</a>
-                            </li>
-                            <li><a href="#">&raquo;</a>
-                            </li>
-                        </ul>
-                    </div>
 
 
                 </div>

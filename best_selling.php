@@ -16,24 +16,37 @@ require_once('/filter.php')
 ?>
 <div class="col-md-9">
                     <div class="box">
-                        <h1>Keychains</h1>
-                        <p>All the keychains with Enchanted Kingdom's magic!</p>
+                        <p><a href = "most_viewed.php">Most Viewed</a> | <a href = "index.php">Featured</a> | <a href = "top_rated.php">Top Rated</a></p>
+                        <h1>Best Selling</h1>
+                        <p>Magical items bought the most by our customers!</p>
                     </div>
 
                     <div class="box info-bar">
                         <div class="row">
                             <div class="col-sm-12 col-md-4 products-showing">
-                               
+                                
                             </div>
 
-                            
+                            <div class="col-sm-12 col-md-8  products-number-sort">
+                                <div class="row">
+                                    <form class="form-inline">
+                                        <div class="col-md-6 col-sm-6">
+                                            <div class="products-number">
+                                                </div>
+                                        </div>
+                                        <div class="col-md-6 col-sm-6">
+                                            
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
                     <div class="row products">
 <?php
 
-$query="select count(prod_id) as count from products where status=1 AND subcategory='keychains'";
+$query="select count(distinct p.prod_id) as count from cart c join inventory i on c.event_id=i.event_id join products p on i.prod_id=p.prod_id where c.cart_activity>1";
                                                     $result=mysqli_query($dbc,$query);
                                                     $row=mysqli_fetch_array($result, MYSQLI_ASSOC);
                                                     $pages=$row['count'] / 10;
@@ -49,14 +62,12 @@ $query="select count(prod_id) as count from products where status=1 AND subcateg
 
                                                                           echo "<h4 align='right'>Page: {$pn}  </h4>";
 
-
-
 $_SESSION['checkout']=0;
 
 
 
 
-$query="select * from products where status=1 AND subcategory='keychains' LIMIT $start,10";
+$query="select p.*,count(p.prod_name) from cart c join inventory i on c.event_id=i.event_id join products p on i.prod_id=p.prod_id where c.cart_activity>1 group by p.prod_name order by count(p.prod_name) desc LIMIT $start,10";
 $result=mysqli_query($dbc,$query);
 
 
@@ -80,6 +91,7 @@ while($row=mysqli_fetch_array($result,MYSQLI_ASSOC)){
                                     </form>
                                     </p>
                                      <p class="price">₱<?php echo "{$row['prod_price']}";?></p>
+                                     
                                 </div>
                                 <!-- /.text -->
                             </div>
@@ -117,7 +129,6 @@ echo"
                                                                           <input type='submit' name='go' value='Go' />
                                                                           </form>
                                                                           ";
-
 
 ?>
 

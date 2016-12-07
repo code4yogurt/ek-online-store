@@ -2,7 +2,7 @@
 <?php
 
 session_start();
-require_once('../mysql_connect.php');
+require_once('../db_connect.php');
 require_once('navbar.php');
 ?>
  <div id="all">
@@ -16,9 +16,9 @@ require_once('/filter.php')
 ?>
 <div class="col-md-9">
                     <div class="box">
-                        <p><a href = "most_viewed.php">Most Viewed</a> | <a href = "index.php">Featured</a></p>
-                        <h1>Featured Items</h1>
-                        <p>Magical items available right now!</p>
+                        <p><a href = "most_viewed.php">Most Viewed</a> | <a href = "index.php">Featured</a> | <a href = "best_selling.php">Best Selling</a></p>
+                        <h1>Top Rated</h1>
+                        <p>Top rated items by our customers!</p>
                     </div>
 
                     <div class="box info-bar">
@@ -27,26 +27,7 @@ require_once('/filter.php')
                                 
                             </div>
 
-                            <div class="col-sm-12 col-md-8  products-number-sort">
-                                <div class="row">
-                                    <form class="form-inline">
-                                        <div class="col-md-6 col-sm-6">
-                                            <div class="products-number">
-                                                <strong>Show</strong>  <a href="#" class="btn btn-default btn-sm btn-primary">12</a>  <a href="#" class="btn btn-default btn-sm">24</a>  <a href="#" class="btn btn-default btn-sm">All</a> products
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6 col-sm-6">
-                                            <div class="products-sort-by">
-                                                <strong>Sort by</strong>
-                                                <select name="sort-by" class="form-control">
-                                                    <option>Price</option>
-                                                    <option>Name</option>
-                                                    <option>Sales first</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </form>
-                                </div>
+                            
                             </div>
                         </div>
                     </div>
@@ -54,13 +35,28 @@ require_once('/filter.php')
                     <div class="row products">
 <?php
 
+$query="SELECT count(distinct r.prod_id) as count FROM new_table r join products p on r.prod_id=p.prod_id";
+                                                    $result=mysqli_query($dbc,$query);
+                                                    $row=mysqli_fetch_array($result, MYSQLI_ASSOC);
+                                                    $pages=$row['count'] / 10;
+                                                    $page_no=ceil($pages);
+                                                    $start=0;
+                                                    if(isset($_GET['go'])){
+                                                      $pn=$_GET['dropdown'];
+                                                    $start=($_GET['dropdown']-1)*10;
+                                                    }
+                                                    else{
+                                                    $pn=1;
+                                                    }
+
+                                                                          echo "<h4 align='right'>Page: {$pn}  </h4>";
 
 $_SESSION['checkout']=0;
 
 
 
 
-$query="SELECT p.*, ROUND(AVG(rating),1) as rating FROM new_table r join products p on r.prod_id=p.prod_id GROUP BY PROD_ID ORDER by AVG(rating) desc";
+$query="SELECT p.*, ROUND(AVG(rating),1) as rating FROM new_table r join products p on r.prod_id=p.prod_id GROUP BY PROD_ID ORDER by AVG(rating) desc LIMIT $start,10";
 $result=mysqli_query($dbc,$query);
 
 
@@ -107,31 +103,24 @@ if(isset($_GET['submit'])){
  header("Location: http://".$_SERVER['HTTP_HOST'].  dirname($_SERVER['PHP_SELF'])."/specificitem.php");
 
 }
+echo"
+                                                                          <form action='{$_SERVER['PHP_SELF']}' method='GET'>
+                                                                          <p align='right'>Page: <select name='dropdown'></p>
+                                                                          ";
+                                                                          for($i=$page_no;$i>0;$i--){
+                                                                            echo"
+                                                                              <option value='{$i}' selected>{$i} </option>
+                                                                            ";
+                                                                          }
+                                                                          echo"
+                                                                          </select>
+                                                                          <input type='submit' name='go' value='Go' />
+                                                                          </form>
+                                                                          ";
+
 ?>
 
-<div class="pages">
 
-                        <p class="loadMore">
-                            <a href="#" class="btn btn-primary btn-lg"><i class="fa fa-chevron-down"></i> Load more</a>
-                        </p>
-
-                        <ul class="pagination">
-                            <li><a href="#">&laquo;</a>
-                            </li>
-                            <li class="active"><a href="#">1</a>
-                            </li>
-                            <li><a href="#">2</a>
-                            </li>
-                            <li><a href="#">3</a>
-                            </li>
-                            <li><a href="#">4</a>
-                            </li>
-                            <li><a href="#">5</a>
-                            </li>
-                            <li><a href="#">&raquo;</a>
-                            </li>
-                        </ul>
-                    </div>
 
 
                 </div>
